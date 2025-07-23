@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Охрана и видеонаблюдение на парковке Шереметьево{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-xl-5 col-lg-6 col-md-12 mb-4 mb-md-0">
+    <!-- Удалён заголовок, теперь блок начинается с карточек-особенностей -->
+    <div class="row row-cols-2 row-cols-md-2 g-2 mb-4">
+      <div class="col">
+        <div class="card h-100 text-center border-0">
+          <div class="card-body py-2 px-1">
+            <div class="mb-1" style="font-size:1.3rem;">
+              <i class="fas fa-user-shield" aria-hidden="true"></i>
+            </div>
+            <div class="fw-bold" style="font-size:1rem;">Лицензированные охранники</div>
+            <div class="small text-muted" style="font-size:0.85rem;">(круглосуточно)</div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card h-100 text-center border-0">
+          <div class="card-body py-2 px-1">
+            <div class="mb-1" style="font-size:1.3rem;">
+              <i class="fas fa-border-style" aria-hidden="true"></i>
+            </div>
+            <div class="fw-bold" style="font-size:1rem;">Высокий забор по периметру</div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card h-100 text-center border-0">
+          <div class="card-body py-2 px-1">
+            <div class="mb-1" style="font-size:1.3rem;">
+              <i class="fas fa-video" aria-hidden="true"></i>
+            </div>
+            <div class="fw-bold" style="font-size:1rem;">Система видеонаблюдения</div>
+            <div class="small text-muted" style="font-size:0.85rem;">с постоянной записью</div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card h-100 text-center border-0">
+          <div class="card-body py-2 px-1">
+            <div class="mb-1" style="font-size:1.3rem;">
+              <i class="fas fa-eye" aria-hidden="true"></i>
+            </div>
+            <div class="fw-bold" style="font-size:1rem;">Мониторинг территории</div>
+            <div class="small text-muted" style="font-size:0.85rem;">в реальном времени</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div class="mb-4">
+      <h2 class="h5 fw-bold mb-3">Преимущества</h2>
+      <ul class="row list-unstyled mb-0">
+        <li class="col-12 col-sm-6 mb-2"><i class="fas fa-check-circle me-2" style="color:#222e3a;"></i>Трансфер до аэропорта</li>
+        <li class="col-12 col-sm-6 mb-2"><i class="fas fa-check-circle me-2" style="color:#222e3a;"></i>Упаковка багажа</li>
+        <li class="col-12 col-sm-6 mb-2"><i class="fas fa-check-circle me-2" style="color:#222e3a;"></i>Бесплатно пуско-зарядное устройство</li>
+        <li class="col-12 col-sm-6 mb-2"><i class="fas fa-check-circle me-2" style="color:#222e3a;"></i>Встреча по прилету</li>
+        <li class="col-12 col-sm-6 mb-2"><i class="fas fa-check-circle me-2" style="color:#222e3a;"></i>Бесплатное взвешивание багажа</li>
+        <li class="col-12 col-sm-6 mb-2"><i class="fas fa-check-circle me-2" style="color:#222e3a;"></i>Бесплатно компрессор для шин</li>
+      </ul>
+    </div>
+    <hr>
+    <div class="mb-4">
+      <h2 class="h5 fw-bold mb-3">Вопрос/Ответ</h2>
+      <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+              Порядок действий
+            </button>
+          </h2>
+          <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              <ol class="mb-0">
+                <li>Вы бронируете место.</li>
+                <li>Приезжаете на парковку.</li>
+                <li>Мы своим транспортом доставляем Вас до аэропорта. Время в пути от парковки до аэропорта 5 минут.</li>
+                <li>По прилете (после получения багажа) Вы звоните нам, пока Вы будете выходить мы приезжаем за Вами и отвозим на парковку.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingTwo">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+              Оплата
+            </button>
+          </h2>
+          <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              По въезде на парковку вы получаете парковочную карту, которая фиксирует ваш автомобиль, дату и время заезда на парковку. Оплата парковки происходит при выезде с парковки.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingThree">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+              Прилетаешь в другой аэропорт?
+            </button>
+          </h2>
+          <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Бронировать такси в другие аэропорты желательно заранее<br>
+              <ul class="mb-0">
+                <li>аэр. Домодедово → аэр. Шереметьево — 2700 рублей</li>
+                <li>аэр. Внуково → аэр. Шереметьево — 2500 рублей</li>
+                <li>аэр. Внуково → аэр. Домодедово — 2500 рублей</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingFour">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+              Как добраться из терминала B в терминал (D) (В,C)?
+            </button>
+          </h2>
+          <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Терминалы B и C, составляющие Северный комплекс, расположены максимально близко друг к другу. Вы можете легко пройти пешком по переходу на 3 этаже. Также можно прогуляться по улице, любуясь видами аэропорта — терминалы находятся буквально в нескольких шагах друг от друга. 😊
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingFive">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+              Место встречи и высадки?
+            </button>
+          </h2>
+          <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Место встречи и высадки закреплено за нами на выезде из терминалов B-C на постоянной основе.<br>
+              Дойти до места остановки трансфера из терминалов B-C можно за 3-5 мин.<br><br>
+              К сожалению, администрацией аэропорта официально запрещены въезд и остановка у терминалов B-C в зоне прилета для всех видов такси и автобусов, кроме городских и личных автомобилей. Надеемся на понимание!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Удалён блок с контактами (div.mob) -->
+  </div>
+  <div class="col-xl-5 col-lg-6 col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Форма бронирования
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="bookingForm" method="POST" action="{{ url_for('book_parking') }}">
+                    <div class="mb-3">
+                        <label for="first_name" class="form-label">Имя *</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="last_name" class="form-label">Фамилия *</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Телефон *</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" 
+                               placeholder="+7 (999) 123-45-67" required>
+                        <div class="form-text">Введите российский номер телефона</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="alert alert-secondary text-center">
+                            <strong>Стоимость одного часа: {{ settings.hourly_price }} ₽</strong>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="booking_start_date" class="form-label">Дата начала *</label>
+                            <input type="date" class="form-control" id="booking_start_date" name="booking_start_date" min="{{ today }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="booking_end_date" class="form-label">Дата конца *</label>
+                            <input type="date" class="form-control" id="booking_end_date" name="booking_end_date" min="{{ today }}" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="booking_start_time" class="form-label">Время начала *</label>
+                            <input type="time" class="form-control" id="booking_start_time" name="booking_start_time" required step="3600" min="00:00" max="23:00" pattern="\d{2}:00" inputmode="numeric">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="booking_end_time" class="form-label">Время конца *</label>
+                            <input type="time" class="form-control" id="booking_end_time" name="booking_end_time" required step="3600" min="00:00" max="23:00" pattern="\d{2}:00" inputmode="numeric">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="selected-time-display" id="selectedTimeDisplay">
+                            <div class="text-muted">Выберите дату и время начала и конца</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="data_consent" name="data_consent" required>
+                            <label class="form-check-label" for="data_consent">
+                                Я согласен на обработку персональных данных *
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div id="finalPrice" class="alert alert-info text-center" style="display:none;">
+                            <strong>Итого: <span id="finalPriceValue">0</span> ₽</strong>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" id="submitBtn" disabled>
+                        <i class="fas fa-calendar-check me-2"></i>
+                        Забронировать
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeBookingForm();
+    const startDateInput = document.getElementById('booking_start_date');
+    const endDateInput = document.getElementById('booking_end_date');
+    startDateInput.addEventListener('change', function() {
+        endDateInput.value = startDateInput.value;
+    });
+});
+</script>
+{% endblock %}

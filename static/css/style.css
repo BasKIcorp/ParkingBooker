@@ -1,0 +1,283 @@
+/* Custom styles for parking reservation system */
+
+/* Оставляем только стили для формы, input, selected-time-display и общие стили */
+
+:root {
+    --bs-body-bg: #f8fafc;
+    --bs-secondary-bg: #f3f6fa;
+    --bs-primary: #4da3ff;
+    --bs-primary-bg-subtle: #eaf4ff;
+    --bs-info-bg-subtle: #eaf6fb;
+    --bs-info-border-subtle: #b6e0f7;
+    --bs-info-text-emphasis: #256080;
+    --bs-border-color: #e0e6ed;
+    --bs-success: #6dc77a;
+    --bs-warning: #ffe066;
+    --bs-danger: #ff6b6b;
+    --bs-body-color: #222e3a;
+    --bs-secondary-color: #7b8a9b;
+}
+
+body {
+    background: linear-gradient(135deg, #e0e7ef 0%, #f8fafc 100%) !important;
+    color: var(--bs-body-color);
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.card, .booking-details, .booking-summary, .metric-card, .qr-container, .accordion, .selected-time-display, .pricing-info, .mob, .form-control, .alert, .vop, .opvac {
+    background: rgba(255,255,255,0.25) !important;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.10);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 1rem !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+}
+
+.form-control {
+    background: rgba(255,255,255,0.45) !important;
+    border: 1px solid rgba(200,200,200,0.18) !important;
+    box-shadow: none !important;
+    color: var(--bs-body-color);
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+input[type="date"], input[type="time"] {
+    color-scheme: light;
+    background: rgba(255,255,255,0.45) !important;
+}
+
+button, .btn {
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 2px 8px rgba(31,38,135,0.07);
+    border: none;
+}
+
+h1, h2, h3, h4, h5, h6, .fw-bold {
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+/* Убираю лишние насыщенные цвета, делаю всё светлым и воздушным */
+.selected-time-display, .selected-time-display.has-selection {
+    background: rgba(255,255,255,0.35) !important;
+    border: 1px solid rgba(200,200,200,0.18) !important;
+    color: var(--bs-body-color);
+}
+
+.alert, .pricing-info {
+    background: rgba(255,255,255,0.35) !important;
+    border: 1px solid rgba(200,200,200,0.18) !important;
+    color: var(--bs-body-color);
+}
+
+.mob {
+    background: rgba(255,255,255,0.25) !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    box-shadow: 0 4px 16px 0 rgba(31,38,135,0.07);
+    border-radius: 1rem !important;
+}
+
+.accordion-button {
+    background: rgba(255,255,255,0.25) !important;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    color: var(--bs-body-color);
+    border-radius: 1rem !important;
+}
+
+.accordion-item {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Для плавности */
+.card, .booking-details, .booking-summary, .metric-card, .qr-container, .accordion, .selected-time-display, .pricing-info, .mob, .form-control, .alert, .vop, .opvac {
+    transition: background 0.4s, box-shadow 0.4s, border 0.4s;
+}
+
+/* Pricing info */
+.pricing-info {
+    background-color: var(--bs-info-bg-subtle);
+    border: 1px solid var(--bs-info-border-subtle);
+    color: var(--bs-info-text-emphasis);
+}
+
+/* Admin metrics */
+.metric-card {
+    text-align: center;
+    padding: 1rem;
+    background-color: var(--bs-secondary-bg);
+    border-radius: 0.375rem;
+    border: 1px solid var(--bs-border-color);
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--bs-primary);
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: var(--bs-secondary-color);
+}
+
+/* Booking details */
+.booking-details {
+    background-color: var(--bs-secondary-bg);
+    padding: 1.5rem;
+    border-radius: 0.375rem;
+    margin: 1rem 0;
+}
+
+/* Phone input styling */
+#phone {
+    font-family: monospace;
+}
+
+/* Form validation feedback */
+.is-invalid {
+    border-color: var(--bs-danger);
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--bs-danger);
+}
+
+/* Success states */
+.border-success {
+    border-color: var(--bs-success) !important;
+}
+
+.border-warning {
+    border-color: var(--bs-warning) !important;
+}
+
+/* Payment page styles */
+.qr-container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.qr-image {
+    max-width: 280px;
+    height: auto;
+    border-radius: 0.5rem;
+}
+
+.payment-amount {
+    background-color: var(--bs-primary-bg-subtle);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--bs-primary);
+}
+
+.booking-summary {
+    background-color: var(--bs-secondary-bg);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--bs-border-color);
+}
+
+.payment-instructions .list-group-item {
+    background-color: var(--bs-secondary-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+}
+
+.payment-instructions .list-group-numbered .list-group-item::before {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+.payment-status {
+    transition: all 0.3s ease;
+}
+
+/* QR code animation */
+.qr-container {
+    animation: qrPulse 2s ease-in-out infinite;
+}
+
+@keyframes qrPulse {
+    0%, 100% {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    50% {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Mobile optimization for payment page */
+@media (max-width: 768px) {
+    .qr-container {
+        padding: 1rem;
+    }
+    .qr-image {
+        max-width: 220px;
+    }
+    .booking-summary {
+        padding: 1rem;
+    }
+    .payment-instructions .list-group-item {
+        font-size: 0.9rem;
+    }
+}
+
+/* Темные иконки для input[type=date] и input[type=time] */
+input[type="date"], input[type="time"] {
+    color-scheme: light;
+}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.2) grayscale(1) brightness(0.7);
+    opacity: 1;
+}
+input[type="date"]::-ms-input-placeholder,
+input[type="time"]::-ms-input-placeholder {
+    color: #222e3a;
+}
+input[type="date"]::placeholder,
+input[type="time"]::placeholder {
+    color: #222e3a;
+}
+
+.glass-header {
+    background: rgba(255,255,255,0.35);
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.10);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 1.2rem;
+    border: 1px solid rgba(255,255,255,0.18);
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+.glass-header h1 {
+    margin-bottom: 0.5rem;
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+@media (max-width: 768px) {
+    .glass-header {
+        border-radius: 0.7rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    .glass-header h1 {
+        font-size: 1.1rem;
+    }
+}
