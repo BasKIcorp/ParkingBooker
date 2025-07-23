@@ -20,7 +20,7 @@ jobs:
         username: deploy
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
-          cd /home/deploy/Parking
+          cd /home/deploy/ParkingBooker
           git pull
           docker compose down
           docker compose build
