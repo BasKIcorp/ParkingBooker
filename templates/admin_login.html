@@ -3,40 +3,95 @@
 {% block title %}Вход в админ-панель{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="card">
-            <div class="card-header bg-dark text-white text-center">
-                <h4 class="mb-0">
-                    <i class="fas fa-user-shield fa-2x mb-2"></i><br>
-                    Админ-панель
-                </h4>
-            </div>
-            <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Имя пользователя</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Пароль</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-sign-in-alt me-2"></i>
-                        Войти
-                    </button>
-                </form>
-                
-                <div class="mt-3">
-                    <small class="text-muted">
-                        По умолчанию: admin / admin123
-                    </small>
-                </div>
-            </div>
+<!-- Main container with background -->
+<div class="main-container">
+  <!-- Header section -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="header-title">
+          <h1>Админ-панель</h1>
+          <p>Управление парковкой</p>
         </div>
+        <div class="header-info">
+          <p>Парковка в 5 минутах от аэропорта</p>
+          <p>Бесплатный трансфер в терминалы B,C</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="contact-info">
+          <div class="phone-section">
+            <i class="fas fa-phone"></i>
+            <span>+7 (495) 147-37-13</span>
+          </div>
+          <p>Работаем круглосуточно</p>
+        </div>
+      </div>
     </div>
+  </header>
+
+  <!-- Main content section -->
+  <div class="main-content">
+    <!-- Admin login section -->
+    <div class="admin-login-section">
+      <div class="admin-login-content">
+        <!-- Admin icon and title -->
+        <div class="admin-header">
+          <div class="admin-icon">
+            <i class="fas fa-user-shield"></i>
+          </div>
+          <h2>Вход в админ-панель</h2>
+          <p>Введите данные для доступа к управлению</p>
+        </div>
+
+        <!-- Login form -->
+        <div class="login-form-card">
+          <form method="POST" class="admin-login-form">
+            <div class="form-group">
+              <label for="username">
+                <i class="fas fa-user"></i>
+                <span>Имя пользователя</span>
+              </label>
+              <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="password">
+                <i class="fas fa-lock"></i>
+                <span>Пароль</span>
+              </label>
+              <input type="password" id="password" name="password" placeholder="Введите пароль" required>
+            </div>
+            
+            <button type="submit" class="login-btn">
+              <i class="fas fa-sign-in-alt"></i>
+              <span>Войти</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Default credentials info -->
+        <div class="credentials-info">
+          <div class="info-header">
+            <i class="fas fa-info-circle"></i>
+            <h3>Данные по умолчанию</h3>
+          </div>
+          <div class="info-content">
+            <p><strong>Логин:</strong> admin</p>
+            <p><strong>Пароль:</strong> admin123</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>© 2024. Парковка Шереметьево</p>
+      <p>Все права защищены</p>
+      <p>Данный сайт носит информационно-справочный характер и ни при каких условиях не является публичной офертой</p>
+    </div>
+  </footer>
 </div>
 {% endblock %}

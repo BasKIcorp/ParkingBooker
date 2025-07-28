@@ -3,68 +3,133 @@
 {% block title %}Бронирование успешно{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card border-success">
-            <div class="card-header bg-success text-white text-center">
-                <h4 class="mb-0">
-                    <i class="fas fa-check-circle fa-2x mb-2"></i><br>
-                    Бронирование успешно!
-                </h4>
-            </div>
-            <div class="card-body">
-                <div class="text-center mb-4">
-                    <p class="lead">Ваше парковочное место успешно забронировано и оплачено.</p>
-                </div>
-
-                <div class="booking-details">
-                    <h5>Детали бронирования:</h5>
-                    <div class="row g-3">
-                        <div class="col-sm-6">
-                            <strong>Имя:</strong><br>
-                            {{ booking.first_name }} {{ booking.last_name }}
-                        </div>
-                        <div class="col-sm-6">
-                            <strong>Телефон:</strong><br>
-                            {{ booking.phone }}
-                        </div>
-                        <div class="col-sm-6">
-                            <strong>Дата:</strong><br>
-                            {{ booking.booking_date.strftime('%d.%m.%Y') }}
-                        </div>
-                        <div class="col-sm-6">
-                            <strong>Время:</strong><br>
-                            {{ "%02d"|format(booking.booking_start_hour) }}:00 - {{ "%02d"|format(booking.booking_end_hour + 1) }}:00
-                        </div>
-                        <div class="col-12">
-                            <strong>Сумма к оплате:</strong><br>
-                            {{ "%.0f"|format(booking.total_amount) }} ₽
-                        </div>
-                        <div class="col-12">
-                            <strong>ID бронирования:</strong><br>
-                            #{{ booking.id }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="alert alert-info mt-4">
-                    <i class="fas fa-info-circle me-2"></i>
-                    <strong>Важная информация:</strong>
-                    <ul class="mb-0 mt-2">
-                        <li>Сохраните номер бронирования для справок</li>
-                        <li>Приезжайте в указанное время</li>
-                        <li>При необходимости свяжитесь с администрацией</li>
-                    </ul>
-                </div>
-
-                <div class="text-center mt-4">
-                    <a href="{{ url_for('index') }}" class="btn btn-primary">
-                        <i class="fas fa-home me-2"></i>
-                        Вернуться на главную
-                    </a>
-                </div>
-            </div>
+<!-- Main container with background -->
+<div class="main-container">
+  <!-- Header section -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="header-title">
+          <h1>Бронирование успешно!</h1>
+          <p>Ваше место забронировано</p>
         </div>
+        <div class="header-info">
+          <p>Парковка в 5 минутах от аэропорта</p>
+          <p>Бесплатный трансфер в терминалы B,C</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="contact-info">
+          <div class="phone-section">
+            <i class="fas fa-phone"></i>
+            <span>+7 (495) 147-37-13</span>
+          </div>
+          <p>Работаем круглосуточно</p>
+        </div>
+      </div>
     </div>
+  </header>
+
+  <!-- Main content section -->
+  <div class="main-content">
+    <!-- Success section -->
+    <div class="success-section">
+      <div class="success-content">
+        <!-- Success icon and message -->
+        <div class="success-header">
+          <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h2>Бронирование успешно!</h2>
+          <p>Ваше парковочное место забронировано</p>
+        </div>
+
+        <!-- Booking details -->
+        <div class="booking-details-card">
+          <h3>Детали бронирования</h3>
+          <div class="details-grid">
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-user"></i>
+                <span>Имя</span>
+              </div>
+              <div class="detail-value">
+                {{ booking.first_name }} {{ booking.last_name }}
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-phone"></i>
+                <span>Телефон</span>
+              </div>
+              <div class="detail-value">
+                {{ booking.phone }}
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-calendar"></i>
+                <span>Дата</span>
+              </div>
+              <div class="detail-value">
+                {{ booking.booking_date.strftime('%d.%m.%Y') }}
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-clock"></i>
+                <span>Время</span>
+              </div>
+              <div class="detail-value">
+                {{ "%02d"|format(booking.booking_start_hour) }}:00 - {{ "%02d"|format(booking.booking_end_hour + 1) }}:00
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-ruble-sign"></i>
+                <span>Сумма к оплате</span>
+              </div>
+              <div class="detail-value total-amount">
+                {{ "%.0f"|format(booking.total_amount) }} ₽
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-hashtag"></i>
+                <span>ID бронирования</span>
+              </div>
+              <div class="detail-value booking-id">
+                #{{ booking.id }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Action buttons -->
+        <div class="action-buttons">
+          <a href="{{ url_for('index') }}" class="btn-primary">
+            <i class="fas fa-home"></i>
+            <span>Вернуться на главную</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>© 2024. Парковка Шереметьево</p>
+      <p>Все права защищены</p>
+      <p>Данный сайт носит информационно-справочный характер и ни при каких условиях не является публичной офертой</p>
+    </div>
+  </footer>
 </div>
 {% endblock %}

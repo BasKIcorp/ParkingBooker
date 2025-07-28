@@ -1,9 +1,5 @@
 import re
-import qrcode
-import uuid
 from datetime import date
-from io import BytesIO
-import base64
 from models import Booking, ParkingSettings
 
 def validate_russian_phone(phone):
@@ -51,47 +47,4 @@ def format_phone_display(phone):
     
     return phone
 
-def generate_sbp_qr_code(amount, order_id, description="Оплата парковки"):
-    """
-    Генерирует QR-код для оплаты через СБП
-    Возвращает base64 изображение QR-кода
-    """
-    # Формируем ссылку СБП (упрощенная версия)
-    # В реальном проекте здесь должна быть интеграция с банковским API
-    sbp_data = f"https://qr.nspk.ru/proxyapp?type=02&bank=100000000004&sum={amount}&cur=RUB&crc=71A3"
-    
-    # Создаем QR-код
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_M,
-        box_size=10,
-        border=4,
-    )
-    
-    qr.add_data(sbp_data)
-    qr.make(fit=True)
-    
-    # Создаем изображение
-    img = qr.make_image(fill_color="black", back_color="white")
-    
-    # Конвертируем в base64
-    buffer = BytesIO()
-    img.save(buffer, format='PNG')
-    img_str = base64.b64encode(buffer.getvalue()).decode()
-    
-    return f"data:image/png;base64,{img_str}"
 
-def create_payment_data(booking, amount):
-    """
-    Создает данные для оплаты СБП
-    """
-    time_range = f"{booking.booking_start_hour:02d}:00 - {booking.booking_end_hour+1:02d}:00"
-    payment_data = {
-        'booking_id': booking.id,
-        'amount': amount,
-        'description': f'Парковка {booking.booking_date.strftime("%d.%m.%Y")} {time_range}',
-        'order_id': booking.stripe_session_id,  # Используем существующее поле как payment_id
-        'customer_name': f'{booking.first_name} {booking.last_name}',
-        'customer_phone': booking.phone
-    }
-    return payment_data

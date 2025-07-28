@@ -162,40 +162,69 @@ function initializeFormValidation() {
 
 // validateForm: добавить проверку диапазона дат/времени
 function validateForm() {
-    const firstName = document.getElementById('first_name').value.trim();
-    const lastName = document.getElementById('last_name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const dataConsent = document.getElementById('data_consent').checked;
-    const submitBtn = document.getElementById('submitBtn');
+    const firstNameInput = document.getElementById('first_name');
+    const lastNameInput = document.getElementById('last_name');
     const phoneInput = document.getElementById('phone');
+    const dataConsentInput = document.getElementById('data_consent');
+    const submitBtn = document.getElementById('submitBtn');
+    const startDateInput = document.getElementById('booking_start_date');
+    const startTimeInput = document.getElementById('booking_start_time');
+    const endDateInput = document.getElementById('booking_end_date');
+    const endTimeInput = document.getElementById('booking_end_time');
 
-    const startDate = document.getElementById('booking_start_date').value;
-    const startTime = document.getElementById('booking_start_time').value;
-    const endDate = document.getElementById('booking_end_date').value;
-    const endTime = document.getElementById('booking_end_time').value;
+    // Проверяем, что все элементы существуют
+    if (!firstNameInput || !lastNameInput || !phoneInput || !dataConsentInput || 
+        !submitBtn || !startDateInput || !startTimeInput || !endDateInput || !endTimeInput) {
+        return;
+    }
 
-    let valid = true;
-    if (!firstName || !lastName || !phone || !dataConsent) valid = false;
-    if (!startDate || !startTime || !endDate || !endTime) valid = false;
+    const firstName = firstNameInput.value.trim();
+    const lastName = lastNameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const dataConsent = dataConsentInput.checked;
+    const startDate = startDateInput.value;
+    const startTime = startTimeInput.value;
+    const endDate = endDateInput.value;
+    const endTime = endTimeInput.value;
+
+    // Собираем причины блокировки
+    let validationErrors = [];
+    
+    if (!firstName) validationErrors.push('Имя не заполнено');
+    if (!lastName) validationErrors.push('Фамилия не заполнена');
+    if (!phone) validationErrors.push('Номер телефона не заполнен');
+    if (!dataConsent) validationErrors.push('Необходимо согласие на обработку данных');
+    if (!startDate) validationErrors.push('Дата начала не выбрана');
+    if (!startTime) validationErrors.push('Время начала не выбрано');
+    if (!endDate) validationErrors.push('Дата конца не выбрана');
+    if (!endTime) validationErrors.push('Время конца не выбрано');
+    
     if (startDate && startTime && endDate && endTime) {
         const now = new Date();
         const startDT = new Date(startDate + 'T' + startTime);
         const endDT = new Date(endDate + 'T' + endTime);
-        if (startDT < now) valid = false;
-        if (endDT <= startDT) valid = false;
-    } else {
-        valid = false;
+        if (startDT < now) validationErrors.push('Время начала не может быть в прошлом');
+        if (endDT <= startDT) validationErrors.push('Время конца должно быть позже времени начала');
     }
+    
     // Строгая валидация телефона
     if (phone && !validatePhoneNumber(phone)) {
-        valid = false;
+        validationErrors.push('Неверный формат номера телефона');
         phoneInput.classList.add('is-invalid');
         showFieldError(phoneInput, 'Введите номер в формате +7 (XXX) XXX-XX-XX');
     } else {
         phoneInput.classList.remove('is-invalid');
         hideFieldError(phoneInput);
     }
+    
+    const valid = validationErrors.length === 0;
     submitBtn.disabled = !valid;
+    
+    // Сохраняем ошибки для отображения при клике
+    submitBtn.dataset.validationErrors = JSON.stringify(validationErrors);
+    
+    // Обновляем расчет цены при валидации
+    updateFinalPrice();
 }
 
 function validatePhoneNumber(phone) {
@@ -223,6 +252,55 @@ function hideFieldError(field) {
     }
 }
 
+function showValidationNotification(errors) {
+    // Удаляем существующее уведомление
+    const existingNotification = document.getElementById('validation-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    // Создаем новое уведомление
+    const notification = document.createElement('div');
+    notification.id = 'validation-notification';
+    notification.className = 'validation-notification';
+    
+    const content = document.createElement('div');
+    content.className = 'notification-content';
+    
+    const header = document.createElement('div');
+    header.className = 'notification-header';
+    header.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Для продолжения исправьте следующие ошибки:</span>';
+    
+    const list = document.createElement('ul');
+    list.className = 'notification-list';
+    
+    errors.forEach(error => {
+        const item = document.createElement('li');
+        item.textContent = error;
+        list.appendChild(item);
+    });
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'notification-close';
+    closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+    closeBtn.addEventListener('click', () => notification.remove());
+    
+    content.appendChild(header);
+    content.appendChild(list);
+    content.appendChild(closeBtn);
+    notification.appendChild(content);
+    
+    // Добавляем уведомление на страницу
+    document.body.appendChild(notification);
+    
+    // Автоматически скрываем через 10 секунд
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 10000);
+}
+
 // Utility functions
 function formatDate(dateStr) {
     const date = new Date(dateStr);
@@ -242,7 +320,15 @@ function updateSelectedTimeDisplay() {
     const startTimeVal = document.getElementById('booking_start_time').value;
     const endDateVal = document.getElementById('booking_end_date').value;
     const endTimeVal = document.getElementById('booking_end_time').value;
+    
+    // Проверяем, существует ли элемент selectedTimeDisplay
     const selectedTimeDisplay = document.getElementById('selectedTimeDisplay');
+    if (!selectedTimeDisplay) {
+        // Если элемента нет, просто обновляем цену
+        updateFinalPrice();
+        return;
+    }
+    
     if (startDateVal && startTimeVal && endDateVal && endTimeVal) {
         const startDT = new Date(startDateVal + 'T' + startTimeVal);
         const endDT = new Date(endDateVal + 'T' + endTimeVal);
@@ -272,38 +358,61 @@ function updateSelectedTimeDisplay() {
 }
 
 function updateFinalPrice() {
-    const startDate = document.getElementById('booking_start_date').value;
-    const startTime = document.getElementById('booking_start_time').value;
-    const endDate = document.getElementById('booking_end_date').value;
-    const endTime = document.getElementById('booking_end_time').value;
+    const startDateInput = document.getElementById('booking_start_date');
+    const startTimeInput = document.getElementById('booking_start_time');
+    const endDateInput = document.getElementById('booking_end_date');
+    const endTimeInput = document.getElementById('booking_end_time');
     const finalPriceBlock = document.getElementById('finalPrice');
     const finalPriceValue = document.getElementById('finalPriceValue');
+    const totalHoursElement = document.getElementById('totalHours');
+    
+    // Проверяем, что все элементы существуют
+    if (!startDateInput || !startTimeInput || !endDateInput || !endTimeInput || 
+        !finalPriceBlock || !finalPriceValue || !totalHoursElement) {
+        return;
+    }
+    
+    const startDate = startDateInput.value;
+    const startTime = startTimeInput.value;
+    const endDate = endDateInput.value;
+    const endTime = endTimeInput.value;
+    
     let pricePerHour = window.hourlyPrice;
     if (!pricePerHour) {
         pricePerHour = Number(document.body.dataset.hourlyPrice) || 0;
     }
+    
     if (startDate && startTime && endDate && endTime) {
         const startDT = new Date(startDate + 'T' + startTime);
         const endDT = new Date(endDate + 'T' + endTime);
         if (endDT > startDT) {
             // Только целые часы между start и end
-            let hours = (endDT - startDT) / (1000 * 60 * 60);
-            finalPriceValue.textContent = hours * pricePerHour;
+            let hours = Math.ceil((endDT - startDT) / (1000 * 60 * 60));
+            let totalPrice = hours * pricePerHour;
+            
+            // Обновляем количество часов
+            totalHoursElement.textContent = hours;
+            
+            // Форматируем цену с разделителями тысяч
+            finalPriceValue.textContent = totalPrice.toLocaleString('ru-RU') + ' ₽';
             finalPriceBlock.style.display = '';
             return;
         }
     }
-    finalPriceValue.textContent = '0';
+    
+    totalHoursElement.textContent = '0';
+    finalPriceValue.textContent = '0 ₽';
     finalPriceBlock.style.display = 'none';
 }
 
-// Handle form submission
+// Handle form submission and button click
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('bookingForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
     if (form) {
         form.addEventListener('submit', function(e) {
             // Add loading state
-            const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.innerHTML;
             
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Обработка...';
@@ -312,26 +421,38 @@ document.addEventListener('DOMContentLoaded', function() {
             // Form will submit naturally, this just provides user feedback
         });
     }
+    
+    // Обработчик клика на заблокированную кнопку
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function(e) {
+            if (this.disabled) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Получаем ошибки валидации
+                const validationErrors = JSON.parse(this.dataset.validationErrors || '[]');
+                
+                if (validationErrors.length > 0) {
+                    // Создаем или обновляем уведомление об ошибках
+                    showValidationNotification(validationErrors);
+                }
+            }
+        });
+    }
 });
 
 // Auto-refresh availability every 5 minutes
 setInterval(function() {
     // Only refresh if user hasn't made a selection
-    if (!selectedDate) {
+    const startDate = document.getElementById('booking_start_date');
+    if (startDate && !startDate.value) {
         window.location.reload();
     }
 }, 5 * 60 * 1000);
 
-// Initialize when DOM is ready (only if not already initialized)
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof initializeBookingForm === 'function') {
-            initializeBookingForm();
-        }
-    });
-} else {
-    // DOM is already ready
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
     if (typeof initializeBookingForm === 'function') {
         initializeBookingForm();
     }
-}
+});

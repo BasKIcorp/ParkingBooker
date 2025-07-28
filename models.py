@@ -19,7 +19,6 @@ class Booking(db.Model):
     booking_start_hour = db.Column(db.Integer, nullable=False)  # начало диапазона
     booking_end_hour = db.Column(db.Integer, nullable=False)    # конец диапазона
     total_amount = db.Column(db.Float, nullable=False)
-    payment_status = db.Column(db.String(20), nullable=False, default='pending')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

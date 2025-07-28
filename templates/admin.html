@@ -3,221 +3,243 @@
 {% block title %}Панель администратора{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>
-        <i class="fas fa-cogs me-2"></i>
-        Панель администратора
-    </h2>
-    <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-secondary">
-        <i class="fas fa-sign-out-alt me-2"></i>
-        Выйти
-    </a>
-</div>
-
-<div class="row">
-    <!-- Settings -->
-    <div class="col-lg-6 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-sliders-h me-2"></i>
-                    Настройки парковки
-                </h5>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('update_settings') }}">
-                    <div class="mb-3">
-                        <label for="total_spots" class="form-label">Общее количество мест</label>
-                        <input type="number" class="form-control" id="total_spots" name="total_spots" 
-                               value="{{ settings.total_spots }}" min="1" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="reserve_spots" class="form-label">Резервные места</label>
-                        <input type="number" class="form-control" id="reserve_spots" name="reserve_spots" 
-                               value="{{ settings.reserve_spots }}" min="0" required>
-                        <div class="form-text">Места, не доступные для бронирования</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="hourly_price" class="form-label">Цена за час (₽)</label>
-                        <input type="number" class="form-control" id="hourly_price" name="hourly_price" 
-                               value="{{ settings.hourly_price }}" min="0" step="0.01" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>
-                        Сохранить настройки
-                    </button>
-                </form>
-            </div>
+<!-- Main container with background -->
+<div class="main-container">
+  <!-- Header section -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="header-title">
+          <h1>Панель администратора</h1>
+          <p>Управление парковкой</p>
         </div>
+        <div class="header-info">
+          <p>Парковка в 5 минутах от аэропорта</p>
+          <p>Бесплатный трансфер в терминалы B,C</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="contact-info">
+          <div class="phone-section">
+            <i class="fas fa-phone"></i>
+            <span>+7 (495) 147-37-13</span>
+          </div>
+          <p>Работаем круглосуточно</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content section -->
+  <div class="main-content">
+    <!-- Admin header with logout -->
+    <div class="admin-panel-header">
+      <div class="admin-header-content">
+        <div class="admin-title">
+          <i class="fas fa-cogs"></i>
+          <h2>Панель администратора</h2>
+        </div>
+        <a href="{{ url_for('admin_logout') }}" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Выйти</span>
+        </a>
+      </div>
     </div>
 
-    <!-- Current Status -->
-    <div class="col-lg-6 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Текущий статус
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="metric-card">
-                            <div class="metric-value">{{ settings.total_spots }}</div>
-                            <div class="metric-label">Всего мест</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="metric-card">
-                            <div class="metric-value">{{ settings.reserve_spots }}</div>
-                            <div class="metric-label">Резерв</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="metric-card">
-                            <div class="metric-value">{{ settings.total_spots - settings.reserve_spots }}</div>
-                            <div class="metric-label">Доступно для бронирования</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="metric-card">
-                            <div class="metric-value">{{ "%.0f"|format(settings.hourly_price) }} ₽</div>
-                            <div class="metric-label">Цена/час</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <!-- Settings and Status Section -->
+    <div class="admin-sections">
+      <!-- Settings -->
+      <div class="admin-section">
+        <div class="section-card">
+          <div class="section-header">
+            <i class="fas fa-sliders-h"></i>
+            <h3>Настройки парковки</h3>
+          </div>
+          <div class="section-content">
+            <form method="POST" action="{{ url_for('update_settings') }}" class="settings-form">
+              <div class="form-group">
+                <label for="total_spots">
+                  <i class="fas fa-parking"></i>
+                  <span>Общее количество мест</span>
+                </label>
+                <input type="number" id="total_spots" name="total_spots" 
+                       value="{{ settings.total_spots }}" min="1" required>
+              </div>
 
-<!-- Today's Bookings -->
-<div class="row">
-    <div class="col-12 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-calendar-check me-2"></i>
-                    Бронирования на сегодня
-                </h5>
-            </div>
-            <div class="card-body">
-                {% if today_bookings %}
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Время</th>
-                                <th>Имя</th>
-                                <th>Телефон</th>
-                                <th>Сумма</th>
-                                <th>Статус</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for booking in today_bookings %}
-                            <tr>
-                                <td>{{ "%02d"|format(booking.booking_start_hour) }}:00-{{ "%02d"|format(booking.booking_end_hour + 1) }}:00</td>
-                                <td>{{ booking.first_name }} {{ booking.last_name }}</td>
-                                <td>{{ booking.phone }}</td>
-                                <td>{{ "%.0f"|format(booking.total_amount) }} ₽</td>
-                                <td>
-                                    <span class="badge bg-success">Оплачено</span>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-muted text-center py-4">
-                    <i class="fas fa-calendar-times fa-3x mb-3"></i>
-                    <p>На сегодня нет бронирований</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
+              <div class="form-group">
+                <label for="reserve_spots">
+                  <i class="fas fa-shield-alt"></i>
+                  <span>Резервные места</span>
+                </label>
+                <input type="number" id="reserve_spots" name="reserve_spots" 
+                       value="{{ settings.reserve_spots }}" min="0" required>
+                <div class="form-hint">Места, не доступные для бронирования</div>
+              </div>
 
-<!-- Recent Bookings -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-history me-2"></i>
-                    Последние бронирования
-                </h5>
-            </div>
-            <div class="card-body">
-                {% if recent_bookings %}
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Дата</th>
-                                <th>Время</th>
-                                <th>Имя</th>
-                                <th>Телефон</th>
-                                <th>Сумма</th>
-                                <th>Создано</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for booking in recent_bookings %}
-                            <tr>
-                                <td>{{ booking.booking_date.strftime('%d.%m.%Y') }}</td>
-                                <td>{{ "%02d"|format(booking.booking_start_hour) }}:00-{{ "%02d"|format(booking.booking_end_hour + 1) }}:00</td>
-                                <td>{{ booking.first_name }} {{ booking.last_name }}</td>
-                                <td>{{ booking.phone }}</td>
-                                <td>{{ "%.0f"|format(booking.total_amount) }} ₽</td>
-                                <td>{{ booking.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-muted text-center py-4">
-                    <i class="fas fa-clipboard-list fa-3x mb-3"></i>
-                    <p>История бронирований пуста</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
+              <div class="form-group">
+                <label for="hourly_price">
+                  <i class="fas fa-ruble-sign"></i>
+                  <span>Цена за час (₽)</span>
+                </label>
+                <input type="number" id="hourly_price" name="hourly_price" 
+                       value="{{ settings.hourly_price }}" min="0" step="0.01" required>
+              </div>
 
-<!-- Add admin login template -->
-<div id="adminLoginModal" class="modal fade" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Вход в админ-панель</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" action="{{ url_for('admin_login') }}">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Имя пользователя</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Пароль</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Войти</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                </div>
+              <button type="submit" class="save-btn">
+                <i class="fas fa-save"></i>
+                <span>Сохранить настройки</span>
+              </button>
             </form>
+          </div>
         </div>
+      </div>
+
+      <!-- Current Status -->
+      <div class="admin-section">
+        <div class="section-card">
+          <div class="section-header">
+            <i class="fas fa-info-circle"></i>
+            <h3>Текущий статус</h3>
+          </div>
+          <div class="section-content">
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="fas fa-parking"></i>
+                </div>
+                <div class="metric-value">{{ settings.total_spots }}</div>
+                <div class="metric-label">Всего мест</div>
+              </div>
+              
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="metric-value">{{ settings.reserve_spots }}</div>
+                <div class="metric-label">Резерв</div>
+              </div>
+              
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="metric-value">{{ settings.total_spots - settings.reserve_spots }}</div>
+                <div class="metric-label">Доступно для бронирования</div>
+              </div>
+              
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="fas fa-ruble-sign"></i>
+                </div>
+                <div class="metric-value">{{ "%.0f"|format(settings.hourly_price) }} ₽</div>
+                <div class="metric-label">Цена/час</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Today's Bookings -->
+    <div class="admin-section full-width">
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-calendar-check"></i>
+          <h3>Бронирования на сегодня</h3>
+        </div>
+        <div class="section-content">
+          {% if today_bookings %}
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Время</th>
+                  <th>Имя</th>
+                  <th>Телефон</th>
+                  <th>Сумма</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for booking in today_bookings %}
+                <tr>
+                  <td>{{ "%02d"|format(booking.booking_start_hour) }}:00-{{ "%02d"|format(booking.booking_end_hour + 1) }}:00</td>
+                  <td>{{ booking.first_name }} {{ booking.last_name }}</td>
+                  <td>{{ booking.phone }}</td>
+                  <td>{{ "%.0f"|format(booking.total_amount) }} ₽</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-calendar-times"></i>
+            </div>
+            <h4>На сегодня нет бронирований</h4>
+            <p>Бронирования появятся здесь, когда клиенты забронируют места</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="admin-section full-width">
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-history"></i>
+          <h3>Последние бронирования</h3>
+        </div>
+        <div class="section-content">
+          {% if recent_bookings %}
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Время</th>
+                  <th>Имя</th>
+                  <th>Телефон</th>
+                  <th>Сумма</th>
+                  <th>Создано</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for booking in recent_bookings %}
+                <tr>
+                  <td>{{ booking.booking_date.strftime('%d.%m.%Y') }}</td>
+                  <td>{{ "%02d"|format(booking.booking_start_hour) }}:00-{{ "%02d"|format(booking.booking_end_hour + 1) }}:00</td>
+                  <td>{{ booking.first_name }} {{ booking.last_name }}</td>
+                  <td>{{ booking.phone }}</td>
+                  <td>{{ "%.0f"|format(booking.total_amount) }} ₽</td>
+                  <td>{{ booking.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-clipboard-list"></i>
+            </div>
+            <h4>История бронирований пуста</h4>
+            <p>Здесь будут отображаться все бронирования</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>© 2024. Парковка Шереметьево</p>
+      <p>Все права защищены</p>
+      <p>Данный сайт носит информационно-справочный характер и ни при каких условиях не является публичной офертой</p>
+    </div>
+  </footer>
 </div>
 {% endblock %}

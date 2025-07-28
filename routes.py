@@ -1,22 +1,11 @@
 import os
-import re
-import requests
-import qrcode
 from datetime import datetime, date, timedelta
-from io import BytesIO
-import base64
-import uuid
-import json
 from flask import render_template, request, redirect, url_for, flash, session, jsonify
-from werkzeug.security import generate_password_hash, check_password_hash
 from app import app, db
 from models import Booking, ParkingSettings, AdminUser
-from utils import get_available_spots_for_hour, validate_russian_phone, generate_sbp_qr_code, create_payment_data
+from utils import get_available_spots_for_hour, validate_russian_phone
 
-# Configure domain
-YOUR_DOMAIN = os.environ.get('REPLIT_DEV_DOMAIN', 'localhost:5000')
-if not YOUR_DOMAIN.startswith('http'):
-    YOUR_DOMAIN = f'https://{YOUR_DOMAIN}' if os.environ.get('REPLIT_DEPLOYMENT') else f'http://{YOUR_DOMAIN}'
+
 
 @app.route('/')
 def index():
@@ -52,9 +41,11 @@ def index():
                          settings=settings,
                          today=today.strftime('%Y-%m-%d'))
 
-@app.route('/book', methods=['POST'])
+@app.route('/book_parking', methods=['POST'])
 def book_parking():
     """Handle booking form submission (диапазон дат и времени)"""
+    print("=== BOOKING REQUEST START ===")
+    print(f"Form data: {request.form}")
     try:
         # Get form data
         first_name = request.form.get('first_name', '').strip()
@@ -138,8 +129,14 @@ def book_parking():
         )
         db.session.add(booking)
         db.session.commit()
+        
+        # Добавляем отладочную информацию
+        print(f"Booking created: ID={booking.id}, Name={first_name} {booking.last_name}, Date={start_date}, Amount={total_amount}")
+        print("=== BOOKING REQUEST SUCCESS ===")
+        
         return redirect(url_for('success', booking_id=booking.id))
     except Exception as e:
+        print(f"=== BOOKING REQUEST ERROR: {str(e)} ===")
         flash(f'Произошла ошибка: {str(e)}', 'error')
         return redirect(url_for('index'))
 
@@ -153,18 +150,7 @@ def success(booking_id=None):
         return redirect(url_for('index'))
     return render_template('success.html', booking=booking)
 
-@app.route('/cancel')
-def payment_cancel():
-    """Handle cancelled payment (old URL)"""
-    booking_id = request.args.get('booking_id')
-    if booking_id:
-        # Remove the booking since payment was cancelled
-        booking = Booking.query.get(booking_id)
-        if booking and booking.payment_status == 'pending':
-            db.session.delete(booking)
-            db.session.commit()
-    
-    return render_template('cancel.html')
+
 
 @app.route('/admin')
 def admin_panel():
@@ -183,14 +169,17 @@ def admin_panel():
     # Get today's bookings for overview
     today = date.today()
     today_bookings = Booking.query.filter_by(
-        booking_date=today,
-        payment_status='paid'
+        booking_date=today
     ).order_by(Booking.booking_start_hour).all()
     
     # Get recent bookings
-    recent_bookings = Booking.query.filter_by(
-        payment_status='paid'
-    ).order_by(Booking.created_at.desc()).limit(20).all()
+    recent_bookings = Booking.query.order_by(Booking.created_at.desc()).limit(20).all()
+    
+    # Добавляем отладочную информацию
+    print(f"Admin panel: Today bookings count: {len(today_bookings)}")
+    print(f"Admin panel: Recent bookings count: {len(recent_bookings)}")
+    for booking in recent_bookings[:3]:  # Показываем первые 3 бронирования
+        print(f"Recent booking: ID={booking.id}, Name={booking.first_name} {booking.last_name}")
     
     return render_template('admin.html', 
                          settings=settings, 
@@ -265,3 +254,58 @@ def update_settings():
         flash(f'Ошибка при обновлении настроек: {str(e)}', 'error')
     
     return redirect(url_for('admin_panel'))
+
+@app.route('/debug/bookings')
+def debug_bookings():
+    """Debug route to check all bookings in database"""
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+    
+    bookings = Booking.query.order_by(Booking.created_at.desc()).all()
+    result = []
+    for booking in bookings:
+        result.append({
+            'id': booking.id,
+            'name': f"{booking.first_name} {booking.last_name}",
+            'phone': booking.phone,
+            'date': booking.booking_date.strftime('%Y-%m-%d'),
+            'time': f"{booking.booking_start_hour:02d}:00-{booking.booking_end_hour+1:02d}:00",
+            'amount': booking.total_amount,
+            'created': booking.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        })
+    
+    return jsonify({
+        'total_bookings': len(bookings),
+        'bookings': result
+    })
+
+@app.route('/debug/database')
+def debug_database():
+    """Debug route to check database status"""
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+    
+    try:
+        # Проверяем настройки
+        settings = ParkingSettings.query.first()
+        settings_info = {
+            'total_spots': settings.total_spots if settings else 'Not found',
+            'reserve_spots': settings.reserve_spots if settings else 'Not found',
+            'hourly_price': settings.hourly_price if settings else 'Not found'
+        }
+        
+        # Проверяем бронирования
+        total_bookings = Booking.query.count()
+        today_bookings = Booking.query.filter_by(booking_date=date.today()).count()
+        
+        return jsonify({
+            'database_status': 'OK',
+            'settings': settings_info,
+            'total_bookings': total_bookings,
+            'today_bookings': today_bookings
+        })
+    except Exception as e:
+        return jsonify({
+            'database_status': 'ERROR',
+            'error': str(e)
+        })

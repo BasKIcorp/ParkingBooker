@@ -1,6 +1,4 @@
 flask
 flask_sqlalchemy
 alembic
-requests
-qrcode
-werkzeug 
+werkzeug
