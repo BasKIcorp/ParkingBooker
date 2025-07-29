@@ -18,7 +18,7 @@ COPY pyproject.toml req.txt ./
 RUN pip install --upgrade pip \
     && pip install poetry \
     && poetry config virtualenvs.create false \
-    && poetry install --no-dev --no-root \
+    && poetry install --only=main --no-root \
     && pip install -r req.txt
 
 # Копирование кода приложения
