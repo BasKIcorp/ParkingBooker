@@ -304,17 +304,11 @@ body {
 }
 
 .input-with-icon input {
-    padding-right: 48px;
     width: 100%;
 }
 
 .input-with-icon i {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #666666;
-    font-size: 18px;
+    display: none;
 }
 
 .time-display {
@@ -1465,6 +1459,8 @@ footer {
     padding: 40px 120px;
     text-align: center;
     margin-top: 111px;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
 }
 
 footer .container {
@@ -1490,10 +1486,13 @@ footer p {
         padding: 23px 60px;
     }
     .main-content,
-    .bottom-sections,
-    footer {
+    .bottom-sections {
         padding-left: 60px;
         padding-right: 60px;
+    }
+    
+    footer {
+        padding: 40px 60px;
     }
     
     .header-left {
@@ -1536,10 +1535,13 @@ footer p {
         padding: 23px 20px;
     }
     .main-content,
-    .bottom-sections,
-    footer {
+    .bottom-sections {
         padding-left: 20px;
         padding-right: 20px;
+    }
+    
+    footer {
+        padding: 40px 20px;
     }
     
     .header-content {
