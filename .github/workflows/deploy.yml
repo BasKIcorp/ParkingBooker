@@ -17,10 +17,10 @@ jobs:
       uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ secrets.SERVER_IP }}
-        username: deploy
+        username: root
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
-          cd /home/deploy/ParkingBooker
+          cd /home/ParkingBooker
           git pull
           docker compose down
           docker compose build
