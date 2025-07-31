@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - main
 
 jobs:
   deploy:
@@ -21,7 +22,56 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           cd /home/ParkingBooker
-          git pull
-          docker compose down
-          docker compose build
-          docker compose up -d
+          
+          # Остановка текущих контейнеров
+          echo "🛑 Останавливаем текущие контейнеры..."
+          docker compose down || true
+          
+          # Получение последних изменений
+          echo "📥 Получаем последние изменения..."
+          git pull origin master
+          
+          # Создание необходимых директорий
+          echo "📁 Создаем необходимые директории..."
+          mkdir -p ssl static instance
+          
+          # Проверка SSL сертификатов
+          if [ ! -f "ssl/cert.pem" ] || [ ! -f "ssl/key.pem" ]; then
+            echo "⚠️  SSL сертификаты не найдены, создаем самоподписанный..."
+            openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+              -keyout ssl/key.pem -out ssl/cert.pem \
+              -subj "/C=RU/ST=Moscow/L=Moscow/O=ParkingBooker/CN=${{ secrets.DOMAIN_NAME || 'localhost' }}"
+          fi
+          
+          # Сборка и запуск контейнеров
+          echo "🔨 Собираем и запускаем контейнеры..."
+          docker compose -f docker-compose.prod.yml build --no-cache
+          docker compose -f docker-compose.prod.yml up -d
+          
+          # Проверка здоровья сервисов
+          echo "🏥 Проверяем здоровье сервисов..."
+          sleep 10
+          
+          # Проверка nginx
+          if curl -f http://localhost > /dev/null 2>&1; then
+            echo "✅ Nginx работает корректно"
+          else
+            echo "❌ Ошибка с nginx"
+            docker compose -f docker-compose.prod.yml logs nginx
+            exit 1
+          fi
+          
+          # Проверка Flask приложения
+          if curl -f http://localhost:5000 > /dev/null 2>&1; then
+            echo "✅ Flask приложение работает корректно"
+          else
+            echo "❌ Ошибка с Flask приложением"
+            docker compose -f docker-compose.prod.yml logs web
+            exit 1
+          fi
+          
+          echo "🚀 Развертывание завершено успешно!"
+          
+          # Очистка неиспользуемых образов
+          echo "🧹 Очищаем неиспользуемые образы..."
+          docker image prune -f
