@@ -1,15 +1,12 @@
 # syntax=docker/dockerfile:1
 FROM python:3.11-slim
 
-# Установка системных зависимостей
-#RUN apt-get update && apt-get install -y \
-#    gcc \
-#    && rm -rf /var/lib/apt/lists/*
-
-
-# Установка системных зависимостей
-RUN apt-get update --fix-missing && apt-get install -y \
+# Установка системных зависимостей с retry и альтернативными репозиториями
+RUN apt-get update --fix-missing && \
+    apt-get install -y \
     apt-transport-https \
+    ca-certificates \
+    curl \
     gcc \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
@@ -22,14 +19,12 @@ WORKDIR /app
 # Копирование файлов зависимостей
 COPY pyproject.toml req.txt ./
 
-# Установка зависимостей
-RUN pip install --upgrade pip \
-    && pip install poetry \
-    && poetry config virtualenvs.create false \
-    && poetry install --only=main --no-root \
-    && pip install -r req.txt
-
-
+# Установка зависимостей с retry
+RUN pip install --upgrade pip --retries 3 && \
+    pip install poetry --retries 3 && \
+    poetry config virtualenvs.create false && \
+    poetry install --only=main --no-root --retries 3 && \
+    pip install -r req.txt --retries 3
 
 # Копирование кода приложения
 COPY . .
