@@ -1,6 +1,23 @@
 // Main JavaScript functionality for parking reservation system
 
 function initializeBookingForm() {
+    // Проверяем, что все необходимые элементы загружены
+    const requiredElements = [
+        'bookingForm',
+        'first_name',
+        'last_name',
+        'phone',
+        'start_date',
+        'end_date',
+        'data_consent'
+    ];
+    
+    const missingElements = requiredElements.filter(id => !document.getElementById(id));
+    if (missingElements.length > 0) {
+        console.warn('Не найдены элементы:', missingElements);
+        return;
+    }
+    
     // Initialize date selection
     initializeDateSelection();
     // Initialize phone input formatting
@@ -199,74 +216,90 @@ function initializeFormValidation() {
 }
 
 function validateForm() {
-    const requiredFields = [
-        'first_name',
-        'last_name', 
-        'phone',
-        'start_date',
-        'end_date'
-    ];
-    
-    const errors = [];
-    
-    // Check required fields
-    requiredFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (!field.value.trim()) {
-            // Находим label для поля, учитывая структуру HTML
-            let label = field.previousElementSibling;
+    try {
+        const requiredFields = [
+            'first_name',
+            'last_name', 
+            'phone',
+            'start_date',
+            'end_date'
+        ];
+        
+        const errors = [];
+        
+        // Check required fields
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (!field) return; // Пропускаем если поле не найдено
             
-            // Если предыдущий элемент не label, ищем label в родительском элементе
-            if (!label || label.tagName !== 'LABEL') {
-                const parentGroup = field.closest('.form-group');
-                if (parentGroup) {
-                    label = parentGroup.querySelector('label[for="' + fieldId + '"]');
+            const fieldValue = field.value || '';
+            if (!fieldValue.trim()) {
+                // Находим label для поля, учитывая структуру HTML
+                let label = field.previousElementSibling;
+                
+                // Если предыдущий элемент не label, ищем label в родительском элементе
+                if (!label || label.tagName !== 'LABEL') {
+                    const parentGroup = field.closest('.form-group');
+                    if (parentGroup) {
+                        label = parentGroup.querySelector('label[for="' + fieldId + '"]');
+                    }
                 }
+                
+                // Получаем текст label или используем fallback с дополнительными проверками
+                let fieldName = fieldId; // fallback
+                if (label && label.textContent) {
+                    fieldName = label.textContent.replace('*', '').trim();
+                }
+                
+                errors.push(`${fieldName} обязательно для заполнения`);
+                showFieldError(field, 'Это поле обязательно для заполнения');
+            } else {
+                hideFieldError(field);
             }
-            
-            // Получаем текст label или используем fallback
-            const fieldName = label ? label.textContent.replace('*', '') : fieldId;
-            errors.push(`${fieldName} обязательно для заполнения`);
-            showFieldError(field, 'Это поле обязательно для заполнения');
-        } else {
-            hideFieldError(field);
-        }
-    });
-    
-    // Validate phone number
-    const phoneField = document.getElementById('phone');
-    if (phoneField && phoneField.value && !validatePhoneNumber(phoneField.value)) {
-        errors.push('Неверный формат номера телефона');
-        showFieldError(phoneField, 'Введите номер в формате +7 (XXX) XXX-XX-XX');
-    }
-    
-    // Validate dates
-    const startDate = document.getElementById('start_date');
-    const endDate = document.getElementById('end_date');
-    if (startDate && endDate && startDate.value && endDate.value) {
-        const start = new Date(startDate.value);
-        const end = new Date(endDate.value);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        });
         
-        if (start < today) {
-            errors.push('Дата заезда не может быть в прошлом');
-            showFieldError(startDate, 'Выберите дату не ранее сегодняшнего дня');
+        // Validate phone number
+        const phoneField = document.getElementById('phone');
+        if (phoneField && phoneField.value && !validatePhoneNumber(phoneField.value)) {
+            errors.push('Неверный формат номера телефона');
+            showFieldError(phoneField, 'Введите номер в формате +7 (XXX) XXX-XX-XX');
         }
         
-        if (end <= start) {
-            errors.push('Дата выезда должна быть позже даты заезда');
-            showFieldError(endDate, 'Дата выезда должна быть позже даты заезда');
+        // Validate dates
+        const startDate = document.getElementById('start_date');
+        const endDate = document.getElementById('end_date');
+        if (startDate && endDate && startDate.value && endDate.value) {
+            try {
+                const start = new Date(startDate.value);
+                const end = new Date(endDate.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (start < today) {
+                    errors.push('Дата заезда не может быть в прошлом');
+                    showFieldError(startDate, 'Выберите дату не ранее сегодняшнего дня');
+                }
+                
+                if (end <= start) {
+                    errors.push('Дата выезда должна быть позже даты заезда');
+                    showFieldError(endDate, 'Дата выезда должна быть позже даты заезда');
+                }
+            } catch (e) {
+                console.warn('Ошибка при валидации дат:', e);
+            }
         }
+        
+        // Check consent
+        const consentCheckbox = document.getElementById('data_consent');
+        if (!consentCheckbox || !consentCheckbox.checked) {
+            errors.push('Необходимо согласие на обработку данных');
+        }
+        
+        return errors.length === 0;
+    } catch (e) {
+        console.error('Ошибка в validateForm:', e);
+        return false;
     }
-    
-    // Check consent
-    const consentCheckbox = document.getElementById('data_consent');
-    if (!consentCheckbox || !consentCheckbox.checked) {
-        errors.push('Необходимо согласие на обработку данных');
-    }
-    
-    return errors.length === 0;
 }
 
 function validatePhoneNumber(phone) {
@@ -353,7 +386,25 @@ function showValidationNotification(errors) {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-        initializeBookingForm();
+    // Попытка инициализации сразу
+    initializeBookingForm();
+    
+    // Если элементы не найдены, попробуем еще раз через небольшую задержку
+    setTimeout(() => {
+        const form = document.getElementById('bookingForm');
+        if (!form) {
+            console.warn('Форма не найдена, повторная попытка инициализации...');
+            initializeBookingForm();
+        }
+    }, 100);
+    
+    // Финальная попытка через 1 секунду
+    setTimeout(() => {
+        const form = document.getElementById('bookingForm');
+        if (!form) {
+            console.error('Форма не найдена после всех попыток');
+        }
+    }, 1000);
 });
 
 // Make functions globally available
