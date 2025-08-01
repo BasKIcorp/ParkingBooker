@@ -36,6 +36,12 @@ jobs:
           git fetch origin
           git reset --hard origin/master
           
+          # Удаление устаревших docker-compose файлов
+          echo "🧹 Удаляем устаревшие файлы..."
+          if [ -f "docker-compose.override.yml" ]; then
+            rm docker-compose.override.yml
+          fi
+          
           # Создание необходимых директорий
           echo "📁 Создаем необходимые директории..."
           mkdir -p ssl static instance

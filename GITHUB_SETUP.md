@@ -94,6 +94,17 @@ apt-get upgrade -y
 nslookup deb.debian.org
 ```
 
+#### 4. Предупреждение "version is obsolete"
+```bash
+# Это предупреждение означает, что в docker-compose.yml используется устаревший атрибут version
+# Автоматическое исправление:
+./cleanup.sh
+
+# Или ручное исправление:
+sed -i '/^version:/d' docker-compose.yml
+sed -i '/^version:/d' docker-compose.prod.yml
+```
+
 ## Настройка Secrets
 
 ### Обязательные Secrets
@@ -235,6 +246,16 @@ docker compose -f docker-compose.prod.yml logs -f
    apt-get update
    ```
 
+5. **Предупреждение "version is obsolete"**
+   ```bash
+   # Автоматическое исправление
+   ./cleanup.sh
+   
+   # Или ручное удаление строки version
+   sed -i '/^version:/d' docker-compose.yml
+   sed -i '/^version:/d' docker-compose.prod.yml
+   ```
+
 ### Полезные команды
 
 ```bash
@@ -252,6 +273,9 @@ gh secret list
 
 # Исправление проблем на сервере
 ./fix-deploy.sh
+
+# Очистка устаревших файлов
+./cleanup.sh
 ```
 
 ## Автоматизация
