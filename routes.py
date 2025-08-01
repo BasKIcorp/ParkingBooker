@@ -120,9 +120,11 @@ def book_parking():
             db.session.rollback()
             error_msg = str(e)
             if 'readonly database' in error_msg.lower():
-                flash('Ошибка: База данных доступна только для чтения. Обратитесь к администратору.', 'error')
+                flash('Ошибка: База данных доступна только для чтения. Обратитесь к администратору. Для исправления запустите: python fix_database_permissions.py', 'error')
             elif 'permission denied' in error_msg.lower():
-                flash('Ошибка: Отказано в доступе к базе данных. Обратитесь к администратору.', 'error')
+                flash('Ошибка: Отказано в доступе к базе данных. Обратитесь к администратору. Проверьте права доступа к файлу базы данных.', 'error')
+            elif 'database is locked' in error_msg.lower():
+                flash('Ошибка: База данных заблокирована. Попробуйте перезапустить приложение.', 'error')
             else:
                 flash(f'Ошибка при сохранении бронирования: {error_msg}', 'error')
             return redirect(url_for('index'))
@@ -164,7 +166,11 @@ def admin_panel():
         except Exception as e:
             error_msg = str(e)
             if 'readonly database' in error_msg.lower():
-                flash('Ошибка: База данных доступна только для чтения. Проверьте права доступа.', 'error')
+                flash('Ошибка: База данных доступна только для чтения. Проверьте права доступа. Запустите: python fix_database_permissions.py', 'error')
+            elif 'permission denied' in error_msg.lower():
+                flash('Ошибка: Отказано в доступе к базе данных. Проверьте права доступа к файлу базы данных.', 'error')
+            elif 'database is locked' in error_msg.lower():
+                flash('Ошибка: База данных заблокирована. Попробуйте перезапустить приложение.', 'error')
             else:
                 flash(f'Ошибка при создании настроек: {error_msg}', 'error')
             return render_template('admin.html', 
@@ -266,9 +272,11 @@ def update_settings():
     except Exception as e:
         error_msg = str(e)
         if 'readonly database' in error_msg.lower():
-            flash('Ошибка: База данных доступна только для чтения. Проверьте права доступа к файлу базы данных.', 'error')
+            flash('Ошибка: База данных доступна только для чтения. Проверьте права доступа к файлу базы данных. Запустите: python fix_database_permissions.py', 'error')
         elif 'permission denied' in error_msg.lower():
             flash('Ошибка: Отказано в доступе к базе данных. Проверьте права доступа.', 'error')
+        elif 'database is locked' in error_msg.lower():
+            flash('Ошибка: База данных заблокирована. Попробуйте перезапустить приложение.', 'error')
         else:
             flash(f'Ошибка при обновлении настроек: {error_msg}', 'error')
     
