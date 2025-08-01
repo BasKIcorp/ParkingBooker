@@ -180,6 +180,8 @@ function initializeFormValidation() {
     const form = document.getElementById('bookingForm');
     const submitBtn = document.getElementById('submitBtn');
     
+    if (!form || !submitBtn) return;
+    
     form.addEventListener('input', function() {
         if (validateForm()) {
             submitBtn.disabled = false;
@@ -211,7 +213,20 @@ function validateForm() {
     requiredFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (!field.value.trim()) {
-            errors.push(`${field.previousElementSibling.textContent.replace('*', '')} обязательно для заполнения`);
+            // Находим label для поля, учитывая структуру HTML
+            let label = field.previousElementSibling;
+            
+            // Если предыдущий элемент не label, ищем label в родительском элементе
+            if (!label || label.tagName !== 'LABEL') {
+                const parentGroup = field.closest('.form-group');
+                if (parentGroup) {
+                    label = parentGroup.querySelector('label[for="' + fieldId + '"]');
+                }
+            }
+            
+            // Получаем текст label или используем fallback
+            const fieldName = label ? label.textContent.replace('*', '') : fieldId;
+            errors.push(`${fieldName} обязательно для заполнения`);
             showFieldError(field, 'Это поле обязательно для заполнения');
         } else {
             hideFieldError(field);
@@ -220,7 +235,7 @@ function validateForm() {
     
     // Validate phone number
     const phoneField = document.getElementById('phone');
-    if (phoneField.value && !validatePhoneNumber(phoneField.value)) {
+    if (phoneField && phoneField.value && !validatePhoneNumber(phoneField.value)) {
         errors.push('Неверный формат номера телефона');
         showFieldError(phoneField, 'Введите номер в формате +7 (XXX) XXX-XX-XX');
     }
@@ -228,7 +243,7 @@ function validateForm() {
     // Validate dates
     const startDate = document.getElementById('start_date');
     const endDate = document.getElementById('end_date');
-    if (startDate.value && endDate.value) {
+    if (startDate && endDate && startDate.value && endDate.value) {
         const start = new Date(startDate.value);
         const end = new Date(endDate.value);
         const today = new Date();
@@ -247,7 +262,7 @@ function validateForm() {
     
     // Check consent
     const consentCheckbox = document.getElementById('data_consent');
-    if (!consentCheckbox.checked) {
+    if (!consentCheckbox || !consentCheckbox.checked) {
         errors.push('Необходимо согласие на обработку данных');
     }
     
@@ -255,6 +270,8 @@ function validateForm() {
 }
 
 function validatePhoneNumber(phone) {
+    if (!phone || typeof phone !== 'string') return false;
+    
     // Remove all non-digit characters
     const digits = phone.replace(/\D/g, '');
     
@@ -270,16 +287,23 @@ function validatePhoneNumber(phone) {
 }
 
 function showFieldError(field, message) {
+    if (!field) return;
+    
     hideFieldError(field);
     
     const errorDiv = document.createElement('div');
     errorDiv.className = 'field-error';
     errorDiv.textContent = message;
-    field.parentNode.appendChild(errorDiv);
-    field.classList.add('error');
+    
+    if (field.parentNode) {
+        field.parentNode.appendChild(errorDiv);
+        field.classList.add('error');
+    }
 }
 
 function hideFieldError(field) {
+    if (!field || !field.parentNode) return;
+    
     const existingError = field.parentNode.querySelector('.field-error');
     if (existingError) {
         existingError.remove();
@@ -288,6 +312,8 @@ function hideFieldError(field) {
 }
 
 function showValidationNotification(errors) {
+    if (!errors || errors.length === 0) return;
+    
     // Remove existing notifications
     const existingNotifications = document.querySelectorAll('.validation-notification');
     existingNotifications.forEach(notification => notification.remove());
@@ -305,7 +331,9 @@ function showValidationNotification(errors) {
         </div>
     `;
     
-    document.body.appendChild(notification);
+    if (document.body) {
+        document.body.appendChild(notification);
+    }
     
     // Auto-remove after 5 seconds
     setTimeout(() => {
@@ -316,9 +344,11 @@ function showValidationNotification(errors) {
     
     // Close button functionality
     const closeBtn = notification.querySelector('.close-notification');
-    closeBtn.addEventListener('click', () => {
-        notification.remove();
-    });
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.remove();
+        });
+    }
 }
 
 // Initialize when DOM is loaded
