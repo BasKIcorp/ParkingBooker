@@ -114,13 +114,24 @@ def book_parking():
         )
         
         db.session.add(booking)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            error_msg = str(e)
+            if 'readonly database' in error_msg.lower():
+                flash('Ошибка: База данных доступна только для чтения. Обратитесь к администратору.', 'error')
+            elif 'permission denied' in error_msg.lower():
+                flash('Ошибка: Отказано в доступе к базе данных. Обратитесь к администратору.', 'error')
+            else:
+                flash(f'Ошибка при сохранении бронирования: {error_msg}', 'error')
+            return redirect(url_for('index'))
         
         return redirect(url_for('success', booking_id=booking.id))
         
     except Exception as e:
         print(f"Error in booking: {e}")
-        flash('Произошла ошибка при бронировании', 'error')
+        flash(f'Произошла ошибка при бронировании: {str(e)}', 'error')
         return redirect(url_for('index'))
 
 @app.route('/success/<int:booking_id>')
@@ -146,9 +157,22 @@ def admin_panel():
     settings = ParkingSettings.query.first()
     if not settings:
         # Create default settings
-        settings = ParkingSettings()
-        db.session.add(settings)
-        db.session.commit()
+        try:
+            settings = ParkingSettings()
+            db.session.add(settings)
+            db.session.commit()
+        except Exception as e:
+            error_msg = str(e)
+            if 'readonly database' in error_msg.lower():
+                flash('Ошибка: База данных доступна только для чтения. Проверьте права доступа.', 'error')
+            else:
+                flash(f'Ошибка при создании настроек: {error_msg}', 'error')
+            return render_template('admin.html', 
+                                settings=None, 
+                                today_bookings=[],
+                                recent_bookings=[],
+                                total_bookings=0,
+                                total_revenue=0)
     
     # Get today's bookings for overview
     today = date.today()
@@ -240,7 +264,13 @@ def update_settings():
     except (ValueError, TypeError):
         flash('Неверный формат данных', 'error')
     except Exception as e:
-        flash(f'Ошибка при обновлении настроек: {str(e)}', 'error')
+        error_msg = str(e)
+        if 'readonly database' in error_msg.lower():
+            flash('Ошибка: База данных доступна только для чтения. Проверьте права доступа к файлу базы данных.', 'error')
+        elif 'permission denied' in error_msg.lower():
+            flash('Ошибка: Отказано в доступе к базе данных. Проверьте права доступа.', 'error')
+        else:
+            flash(f'Ошибка при обновлении настроек: {error_msg}', 'error')
     
     return redirect(url_for('admin_panel'))
 
