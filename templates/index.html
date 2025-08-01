@@ -335,8 +335,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Auto-set end date to start date
-    const startDateInput = document.getElementById('booking_start_date');
-    const endDateInput = document.getElementById('booking_end_date');
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
     if (startDateInput && endDateInput) {
         startDateInput.addEventListener('change', function() {
             endDateInput.value = startDateInput.value;

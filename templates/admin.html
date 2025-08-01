@@ -237,7 +237,7 @@
                   <td>{{ booking.vehicle_type }}</td>
                   <td>{{ booking.first_name }} {{ booking.last_name }}</td>
                   <td>{{ booking.phone }}</td>
-                  <td>{{ booking.booking_start_date.strftime('%d.%m.%Y') }} - {{ booking.booking_end_date.strftime('%d.%m.%Y') }}</td>
+                  <td>{{ booking.start_date.strftime('%d.%m.%Y') }} - {{ booking.end_date.strftime('%d.%m.%Y') }}</td>
                   <td>{{ "%.0f"|format(booking.total_amount) }} ₽</td>
                 </tr>
                 {% endfor %}
