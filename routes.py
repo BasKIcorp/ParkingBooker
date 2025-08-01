@@ -1,9 +1,9 @@
 import os
 from datetime import datetime, date, timedelta
-from flask import render_template, request, redirect, url_for, flash, session, jsonify
+from flask import render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from app import app, db
 from models import Booking, ParkingSettings, AdminUser
-from utils import get_available_spots_for_hour, validate_russian_phone
+from utils import get_available_spots_for_date, validate_russian_phone, calculate_daily_price
 
 
 
@@ -12,26 +12,19 @@ def index():
     """Main page with parking availability and booking form"""
     today = date.today()
     
-    # Get next 7 days of availability
+    # Get next 30 days of availability
     days_schedule = []
-    for i in range(7):
+    for i in range(30):
         current_date = today + timedelta(days=i)
-        hours_availability = []
-        
-        for hour in range(24):
-            available_spots = get_available_spots_for_hour(current_date, hour)
-            hours_availability.append({
-                'hour': hour,
-                'available_spots': available_spots,
-                'is_available': available_spots > 0
-            })
+        available_spots = get_available_spots_for_date(current_date)
         
         days_schedule.append({
             'date': current_date,
             'date_str': current_date.strftime('%Y-%m-%d'),
             'date_display': current_date.strftime('%d.%m.%Y'),
             'day_name': current_date.strftime('%A'),
-            'hours': hours_availability
+            'available_spots': available_spots,
+            'is_available': available_spots > 0
         })
     
     settings = ParkingSettings.query.first()
@@ -43,7 +36,7 @@ def index():
 
 @app.route('/book_parking', methods=['POST'])
 def book_parking():
-    """Handle booking form submission (диапазон дат и времени)"""
+    """Handle booking form submission (daily booking)"""
     print("=== BOOKING REQUEST START ===")
     print(f"Form data: {request.form}")
     try:
@@ -51,10 +44,10 @@ def book_parking():
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
         phone = request.form.get('phone', '').strip()
-        start_date_str = request.form.get('booking_start_date', '').strip()
-        start_time_str = request.form.get('booking_start_time', '').strip()
-        end_date_str = request.form.get('booking_end_date', '').strip()
-        end_time_str = request.form.get('booking_end_time', '').strip()
+        is_minibus = request.form.get('is_minibus') == '1'
+        vehicle_type = 'minibus' if is_minibus else 'car'
+        start_date_str = request.form.get('start_date', '').strip()
+        end_date_str = request.form.get('end_date', '').strip()
         data_consent = request.form.get('data_consent')
 
         # Validation
@@ -67,10 +60,10 @@ def book_parking():
             errors.append('Телефон обязателен для заполнения')
         elif not validate_russian_phone(phone):
             errors.append('Неверный формат номера телефона')
-        if not start_date_str or not start_time_str:
-            errors.append('Дата и время начала обязательны')
-        if not end_date_str or not end_time_str:
-            errors.append('Дата и время конца обязательны')
+        if not start_date_str:
+            errors.append('Дата начала обязательна')
+        if not end_date_str:
+            errors.append('Дата окончания обязательна')
         if not data_consent:
             errors.append('Необходимо согласие на обработку данных')
         if errors:
@@ -78,83 +71,74 @@ def book_parking():
                 flash(error, 'error')
             return redirect(url_for('index'))
 
-        # Parse and validate date/time
+        # Parse and validate dates
         try:
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-            start_time = datetime.strptime(start_time_str, '%H:%M').time()
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
-            end_time = datetime.strptime(end_time_str, '%H:%M').time()
-            start_dt = datetime.combine(start_date, start_time)
-            end_dt = datetime.combine(end_date, end_time)
         except (ValueError, TypeError):
-            flash('Неверный формат даты или времени', 'error')
+            flash('Неверный формат даты', 'error')
             return redirect(url_for('index'))
 
-        now = datetime.now()
-        if start_dt < now:
-            flash('Время начала не может быть в прошлом', 'error')
+        now = date.today()
+        if start_date < now:
+            flash('Дата начала не может быть в прошлом', 'error')
             return redirect(url_for('index'))
-        if end_dt <= start_dt:
-            flash('Время конца должно быть позже времени начала', 'error')
-            return redirect(url_for('index'))
-        if start_date != end_date:
-            flash('Бронирование возможно только в пределах одной даты', 'error')
+        if end_date <= start_date:
+            flash('Дата окончания должна быть позже даты начала', 'error')
             return redirect(url_for('index'))
 
-        # Check availability for all hours in range
-        start_hour = start_time.hour
-        end_hour = end_time.hour
-        for hour in range(start_hour, end_hour + 1):
-            available_spots = get_available_spots_for_hour(start_date, hour)
+        # Calculate total days
+        total_days = (end_date - start_date).days + 1
+        
+        # Calculate total amount
+        total_amount = calculate_daily_price(total_days, vehicle_type)
+        
+        # Check availability for all dates
+        for i in range(total_days):
+            check_date = start_date + timedelta(days=i)
+            available_spots = get_available_spots_for_date(check_date)
             if available_spots <= 0:
-                flash(f'Нет свободных мест на {hour:02d}:00', 'error')
+                flash(f'Нет свободных мест на {check_date.strftime("%d.%m.%Y")}', 'error')
                 return redirect(url_for('index'))
 
-        # Get pricing
-        settings = ParkingSettings.query.first()
-        if not settings:
-            flash('Ошибка конфигурации системы', 'error')
-            return redirect(url_for('index'))
-        total_amount = settings.hourly_price * (end_hour - start_hour + 1)
-
-        # Create booking record
+        # Create booking
         booking = Booking(
             first_name=first_name,
             last_name=last_name,
             phone=phone,
-            booking_date=start_date,
-            booking_start_hour=start_hour,
-            booking_end_hour=end_hour,
+            vehicle_type=vehicle_type,
+            start_date=start_date,
+            end_date=end_date,
+            total_days=total_days,
             total_amount=total_amount
         )
+        
         db.session.add(booking)
         db.session.commit()
         
-        # Добавляем отладочную информацию
-        print(f"Booking created: ID={booking.id}, Name={first_name} {booking.last_name}, Date={start_date}, Amount={total_amount}")
-        print("=== BOOKING REQUEST SUCCESS ===")
-        
         return redirect(url_for('success', booking_id=booking.id))
+        
     except Exception as e:
-        print(f"=== BOOKING REQUEST ERROR: {str(e)} ===")
-        flash(f'Произошла ошибка: {str(e)}', 'error')
+        print(f"Error in booking: {e}")
+        flash('Произошла ошибка при бронировании', 'error')
         return redirect(url_for('index'))
 
 @app.route('/success/<int:booking_id>')
 def success(booking_id=None):
-    """Handle successful booking (no payment)"""
-    if booking_id:
-        booking = Booking.query.get_or_404(booking_id)
-    else:
-        flash('Ошибка подтверждения бронирования', 'error')
+    """Success page after booking"""
+    if not booking_id:
         return redirect(url_for('index'))
+    
+    booking = Booking.query.get(booking_id)
+    if not booking:
+        flash('Бронирование не найдено', 'error')
+        return redirect(url_for('index'))
+    
     return render_template('success.html', booking=booking)
-
-
 
 @app.route('/admin')
 def admin_panel():
-    """Admin panel for managing parking settings"""
+    """Admin panel"""
     # Simple auth check
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
@@ -168,23 +152,24 @@ def admin_panel():
     
     # Get today's bookings for overview
     today = date.today()
-    today_bookings = Booking.query.filter_by(
-        booking_date=today
-    ).order_by(Booking.booking_start_hour).all()
+    today_bookings = Booking.query.filter(
+        Booking.start_date <= today,
+        Booking.end_date >= today
+    ).order_by(Booking.start_date).all()
     
     # Get recent bookings
     recent_bookings = Booking.query.order_by(Booking.created_at.desc()).limit(20).all()
     
-    # Добавляем отладочную информацию
-    print(f"Admin panel: Today bookings count: {len(today_bookings)}")
-    print(f"Admin panel: Recent bookings count: {len(recent_bookings)}")
-    for booking in recent_bookings[:3]:  # Показываем первые 3 бронирования
-        print(f"Recent booking: ID={booking.id}, Name={booking.first_name} {booking.last_name}")
+    # Calculate statistics
+    total_bookings = Booking.query.count()
+    total_revenue = db.session.query(db.func.sum(Booking.total_amount)).scalar() or 0
     
     return render_template('admin.html', 
                          settings=settings, 
                          today_bookings=today_bookings,
-                         recent_bookings=recent_bookings)
+                         recent_bookings=recent_bookings,
+                         total_bookings=total_bookings,
+                         total_revenue=total_revenue)
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -217,7 +202,9 @@ def update_settings():
     try:
         total_spots = int(request.form.get('total_spots', 0))
         reserve_spots = int(request.form.get('reserve_spots', 0))
-        hourly_price = float(request.form.get('hourly_price', 0))
+        daily_price_1_25 = float(request.form.get('daily_price_1_25', 0))
+        daily_price_26_plus = float(request.form.get('daily_price_26_plus', 0))
+        minibus_price = float(request.form.get('minibus_price', 0))
         
         if total_spots < 1:
             flash('Общее количество мест должно быть больше 0', 'error')
@@ -231,8 +218,8 @@ def update_settings():
             flash('Резервные места должны быть меньше общего количества', 'error')
             return redirect(url_for('admin_panel'))
         
-        if hourly_price < 0:
-            flash('Цена не может быть отрицательной', 'error')
+        if daily_price_1_25 < 0 or daily_price_26_plus < 0 or minibus_price < 0:
+            flash('Цены не могут быть отрицательными', 'error')
             return redirect(url_for('admin_panel'))
         
         settings = ParkingSettings.query.first()
@@ -242,7 +229,9 @@ def update_settings():
         
         settings.total_spots = total_spots
         settings.reserve_spots = reserve_spots
-        settings.hourly_price = hourly_price
+        settings.daily_price_1_25 = daily_price_1_25
+        settings.daily_price_26_plus = daily_price_26_plus
+        settings.minibus_price = minibus_price
         settings.updated_at = datetime.utcnow()
         
         db.session.commit()
@@ -268,8 +257,10 @@ def debug_bookings():
             'id': booking.id,
             'name': f"{booking.first_name} {booking.last_name}",
             'phone': booking.phone,
-            'date': booking.booking_date.strftime('%Y-%m-%d'),
-            'time': f"{booking.booking_start_hour:02d}:00-{booking.booking_end_hour+1:02d}:00",
+            'vehicle_type': booking.vehicle_type,
+            'start_date': booking.start_date.strftime('%Y-%m-%d'),
+            'end_date': booking.end_date.strftime('%Y-%m-%d'),
+            'total_days': booking.total_days,
             'amount': booking.total_amount,
             'created': booking.created_at.strftime('%Y-%m-%d %H:%M:%S')
         })
@@ -278,6 +269,16 @@ def debug_bookings():
         'total_bookings': len(bookings),
         'bookings': result
     })
+
+@app.route('/agreement.pdf')
+def agreement_pdf():
+    """Serve agreement PDF file"""
+    return send_from_directory('.', 'agreement.pdf')
+
+@app.route('/policy.pdf')
+def policy_pdf():
+    """Serve policy PDF file"""
+    return send_from_directory('.', 'policy.pdf')
 
 @app.route('/debug/database')
 def debug_database():
@@ -291,12 +292,18 @@ def debug_database():
         settings_info = {
             'total_spots': settings.total_spots if settings else 'Not found',
             'reserve_spots': settings.reserve_spots if settings else 'Not found',
-            'hourly_price': settings.hourly_price if settings else 'Not found'
+            'daily_price_1_25': settings.daily_price_1_25 if settings else 'Not found',
+            'daily_price_26_plus': settings.daily_price_26_plus if settings else 'Not found',
+            'minibus_price': settings.minibus_price if settings else 'Not found'
         }
         
         # Проверяем бронирования
         total_bookings = Booking.query.count()
-        today_bookings = Booking.query.filter_by(booking_date=date.today()).count()
+        today = date.today()
+        today_bookings = Booking.query.filter(
+            Booking.start_date <= today,
+            Booking.end_date >= today
+        ).count()
         
         return jsonify({
             'database_status': 'OK',

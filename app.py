@@ -39,7 +39,9 @@ with app.app_context():
         default_settings = ParkingSettings(
             total_spots=50,
             reserve_spots=5,
-            hourly_price=100.0
+            daily_price_1_25=350.0,  # 1-25 сутки
+            daily_price_26_plus=150.0,  # 26+ сутки
+            minibus_price=700.0  # Микроавтобус
         )
         db.session.add(default_settings)
         db.session.commit()

@@ -70,21 +70,45 @@
             
             <div class="detail-item">
               <div class="detail-label">
-                <i class="fas fa-calendar"></i>
-                <span>Дата</span>
+                <i class="fas fa-car"></i>
+                <span>Тип транспорта</span>
               </div>
               <div class="detail-value">
-                {{ booking.booking_date.strftime('%d.%m.%Y') }}
+                {% if booking.vehicle_type == 'minibus' %}
+                  Микроавтобус
+                {% else %}
+                  Легковой автомобиль
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-calendar"></i>
+                <span>Дата заезда</span>
+              </div>
+              <div class="detail-value">
+                {{ booking.start_date.strftime('%d.%m.%Y') }}
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-calendar-check"></i>
+                <span>Дата выезда</span>
+              </div>
+              <div class="detail-value">
+                {{ booking.end_date.strftime('%d.%m.%Y') }}
               </div>
             </div>
             
             <div class="detail-item">
               <div class="detail-label">
                 <i class="fas fa-clock"></i>
-                <span>Время</span>
+                <span>Количество суток</span>
               </div>
               <div class="detail-value">
-                {{ "%02d"|format(booking.booking_start_hour) }}:00 - {{ "%02d"|format(booking.booking_end_hour + 1) }}:00
+                {{ booking.total_days }} {{ 'сутка' if booking.total_days == 1 else 'суток' if booking.total_days < 5 else 'суток' }}
               </div>
             </div>
             
@@ -122,14 +146,4 @@
       </div>
     </div>
   </div>
-
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <p>© 2024. Парковка Шереметьево</p>
-      <p>Все права защищены</p>
-      <p>Данный сайт носит информационно-справочный характер и ни при каких условиях не является публичной офертой</p>
-    </div>
-  </footer>
-</div>
 {% endblock %}

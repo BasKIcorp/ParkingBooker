@@ -87,8 +87,19 @@
         <!-- Right side with booking form -->
         <div class="booking-content">
           <h3>Форма бронирования</h3>
-          <div class="price-info">
-            <p>Стоимость одного часа: {{ settings.hourly_price }} ₽</p>
+          <div class="price-info" id="priceInfo">
+            <h4>Тарифы:</h4>
+            <div id="carTariffs" class="tariff-section">
+              <ul>
+                <li>1-25 сутки: {{ settings.daily_price_1_25 }} ₽/сутки</li>
+                <li>26+ сутки: {{ settings.daily_price_26_plus }} ₽/сутки</li>
+              </ul>
+            </div>
+            <div id="minibusTariffs" class="tariff-section" style="display: none;">
+              <ul>
+                <li>{{ settings.minibus_price }} ₽/сутки</li>
+              </ul>
+            </div>
           </div>
           
           <form id="bookingForm" method="POST" action="{{ url_for('book_parking') }}" class="booking-form">
@@ -108,48 +119,49 @@
               <input type="tel" id="phone" name="phone" placeholder="+7 (000) 000-00-00" required>
             </div>
             
-            <div class="form-row">
-              <div class="form-group">
-                <label for="booking_start_date">Дата начала*</label>
-                <div class="input-with-icon">
-                  <input type="date" id="booking_start_date" name="booking_start_date" min="{{ today }}" required>
-                  <i class="fas fa-calendar"></i>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="booking_end_date">Дата конца*</label>
-                <div class="input-with-icon">
-                  <input type="date" id="booking_end_date" name="booking_end_date" min="{{ today }}" required>
-                  <i class="fas fa-calendar"></i>
-                </div>
-              </div>
+            <div class="form-group full-width">
+              <label for="vehicle_type">
+                <input type="checkbox" id="is_minibus" name="is_minibus" value="1">
+                <span>Микроавтобус</span>
+              </label>
+              <input type="hidden" id="vehicle_type" name="vehicle_type" value="car">
             </div>
             
             <div class="form-row">
               <div class="form-group">
-                <label for="booking_start_time">Время начала*</label>
-                <input type="time" id="booking_start_time" name="booking_start_time" required step="3600" min="00:00" max="23:00">
+                <label for="start_date">Дата заезда*</label>
+                <div class="input-with-icon">
+                  <input type="date" id="start_date" name="start_date" min="{{ today }}" required>
+                  <i class="fas fa-calendar"></i>
+                </div>
               </div>
               <div class="form-group">
-                <label for="booking_end_time">Время конца*</label>
-                <input type="time" id="booking_end_time" name="booking_end_time" required step="3600" min="00:00" max="23:00">
+                <label for="end_date">Дата выезда*</label>
+                <div class="input-with-icon">
+                  <input type="date" id="end_date" name="end_date" min="{{ today }}" required>
+                  <i class="fas fa-calendar"></i>
+                </div>
               </div>
             </div>
             
             <div class="time-display">
-              <p>Выберите дату и время начала и конца</p>
+              <p>Выберите даты заезда и выезда</p>
             </div>
             
             <!-- Final price calculation -->
             <div id="finalPrice" class="final-price-block" style="display: none;">
               <div class="price-calculation">
                 <div class="price-row">
-                  <span>Количество часов:</span>
-                  <span id="totalHours">0</span>
+                  <span>Количество суток:</span>
+                  <span id="totalDays">0</span>
                 </div>
                 <div class="price-row">
-                  <span>Стоимость за час:</span>
-                  <span>{{ settings.hourly_price }} ₽</span>
+                  <span>Тип транспорта:</span>
+                  <span id="vehicleTypeDisplay">Легковой автомобиль</span>
+                </div>
+                <div class="price-row">
+                  <span>Стоимость за сутки:</span>
+                  <span id="dailyPrice">0 ₽</span>
                 </div>
                 <div class="price-row total">
                   <span>Итого к оплате:</span>
@@ -161,7 +173,10 @@
             <div class="form-actions">
               <div class="checkbox-group">
                 <input type="checkbox" id="data_consent" name="data_consent" required>
-                <label for="data_consent">Я согласен на обработку персональных данных*</label>
+                <label for="data_consent">
+                  Я согласен на обработку персональных данных и принимаю 
+                  <a href="/agreement.pdf" target="_blank">пользовательское соглашение</a>*
+                </label>
               </div>
               
               <button type="submit" class="submit-btn" id="submitBtn" disabled>
@@ -290,15 +305,6 @@
       </div>
     </section>
   </div>
-
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <p>© 2024. Парковка Шереметьево</p>
-      <p>Все права защищены</p>
-      <p>Данный сайт носит информационно-справочный характер и ни при каких условиях не является публичной офертой</p>
-    </div>
-  </footer>
 </div>
 {% endblock %}
 

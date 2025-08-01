@@ -46,6 +46,43 @@
       </div>
     </div>
 
+    <!-- Statistics Section -->
+    <div class="admin-section full-width">
+      <div class="section-card">
+        <div class="section-header">
+          <i class="fas fa-chart-bar"></i>
+          <h3>Статистика</h3>
+        </div>
+        <div class="section-content">
+          <div class="metrics-grid">
+            <div class="metric-item">
+              <div class="metric-icon">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <div class="metric-value">{{ total_bookings }}</div>
+              <div class="metric-label">Всего бронирований</div>
+            </div>
+            
+            <div class="metric-item">
+              <div class="metric-icon">
+                <i class="fas fa-ruble-sign"></i>
+              </div>
+              <div class="metric-value">{{ "%.0f"|format(total_revenue) }} ₽</div>
+              <div class="metric-label">Общий доход</div>
+            </div>
+            
+            <div class="metric-item">
+              <div class="metric-icon">
+                <i class="fas fa-calendar-day"></i>
+              </div>
+              <div class="metric-value">{{ today_bookings|length }}</div>
+              <div class="metric-label">Бронирований сегодня</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Settings and Status Section -->
     <div class="admin-sections">
       <!-- Settings -->
@@ -77,12 +114,30 @@
               </div>
 
               <div class="form-group">
-                <label for="hourly_price">
+                <label for="daily_price_1_25">
                   <i class="fas fa-ruble-sign"></i>
-                  <span>Цена за час (₽)</span>
+                  <span>Цена 1-25 сутки (₽)</span>
                 </label>
-                <input type="number" id="hourly_price" name="hourly_price" 
-                       value="{{ settings.hourly_price }}" min="0" step="0.01" required>
+                <input type="number" id="daily_price_1_25" name="daily_price_1_25" 
+                       value="{{ settings.daily_price_1_25 }}" min="0" step="0.01" required>
+              </div>
+
+              <div class="form-group">
+                <label for="daily_price_26_plus">
+                  <i class="fas fa-ruble-sign"></i>
+                  <span>Цена 26+ сутки (₽)</span>
+                </label>
+                <input type="number" id="daily_price_26_plus" name="daily_price_26_plus" 
+                       value="{{ settings.daily_price_26_plus }}" min="0" step="0.01" required>
+              </div>
+
+              <div class="form-group">
+                <label for="minibus_price">
+                  <i class="fas fa-bus"></i>
+                  <span>Цена микроавтобус (₽)</span>
+                </label>
+                <input type="number" id="minibus_price" name="minibus_price" 
+                       value="{{ settings.minibus_price }}" min="0" step="0.01" required>
               </div>
 
               <button type="submit" class="save-btn">
@@ -131,8 +186,24 @@
                 <div class="metric-icon">
                   <i class="fas fa-ruble-sign"></i>
                 </div>
-                <div class="metric-value">{{ "%.0f"|format(settings.hourly_price) }} ₽</div>
-                <div class="metric-label">Цена/час</div>
+                <div class="metric-value">{{ "%.0f"|format(settings.daily_price_1_25) }} ₽</div>
+                <div class="metric-label">Цена/сутки (1-25)</div>
+              </div>
+              
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="fas fa-ruble-sign"></i>
+                </div>
+                <div class="metric-value">{{ "%.0f"|format(settings.daily_price_26_plus) }} ₽</div>
+                <div class="metric-label">Цена/сутки (26+)</div>
+              </div>
+              
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="fas fa-bus"></i>
+                </div>
+                <div class="metric-value">{{ "%.0f"|format(settings.minibus_price) }} ₽</div>
+                <div class="metric-label">Микроавтобус/сутки</div>
               </div>
             </div>
           </div>
@@ -153,18 +224,20 @@
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th>Время</th>
+                  <th>Тип транспорта</th>
                   <th>Имя</th>
                   <th>Телефон</th>
+                  <th>Период</th>
                   <th>Сумма</th>
                 </tr>
               </thead>
               <tbody>
                 {% for booking in today_bookings %}
                 <tr>
-                  <td>{{ "%02d"|format(booking.booking_start_hour) }}:00-{{ "%02d"|format(booking.booking_end_hour + 1) }}:00</td>
+                  <td>{{ booking.vehicle_type }}</td>
                   <td>{{ booking.first_name }} {{ booking.last_name }}</td>
                   <td>{{ booking.phone }}</td>
+                  <td>{{ booking.booking_start_date.strftime('%d.%m.%Y') }} - {{ booking.booking_end_date.strftime('%d.%m.%Y') }}</td>
                   <td>{{ "%.0f"|format(booking.total_amount) }} ₽</td>
                 </tr>
                 {% endfor %}
@@ -197,10 +270,11 @@
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th>Дата</th>
-                  <th>Время</th>
+                  <th>Тип транспорта</th>
                   <th>Имя</th>
                   <th>Телефон</th>
+                  <th>Период</th>
+                  <th>Суток</th>
                   <th>Сумма</th>
                   <th>Создано</th>
                 </tr>
@@ -208,10 +282,17 @@
               <tbody>
                 {% for booking in recent_bookings %}
                 <tr>
-                  <td>{{ booking.booking_date.strftime('%d.%m.%Y') }}</td>
-                  <td>{{ "%02d"|format(booking.booking_start_hour) }}:00-{{ "%02d"|format(booking.booking_end_hour + 1) }}:00</td>
+                  <td>
+                    {% if booking.vehicle_type == 'minibus' %}
+                      Микроавтобус
+                    {% else %}
+                      Легковой
+                    {% endif %}
+                  </td>
                   <td>{{ booking.first_name }} {{ booking.last_name }}</td>
                   <td>{{ booking.phone }}</td>
+                  <td>{{ booking.start_date.strftime('%d.%m.%Y') }} - {{ booking.end_date.strftime('%d.%m.%Y') }}</td>
+                  <td>{{ booking.total_days }}</td>
                   <td>{{ "%.0f"|format(booking.total_amount) }} ₽</td>
                   <td>{{ booking.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
                 </tr>
@@ -232,14 +313,4 @@
       </div>
     </div>
   </div>
-
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <p>© 2024. Парковка Шереметьево</p>
-      <p>Все права защищены</p>
-      <p>Данный сайт носит информационно-справочный характер и ни при каких условиях не является публичной офертой</p>
-    </div>
-  </footer>
-</div>
 {% endblock %}

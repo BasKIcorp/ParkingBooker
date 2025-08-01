@@ -1,5 +1,5 @@
 import re
-from datetime import date
+from datetime import date, timedelta
 from models import Booking, ParkingSettings
 
 def validate_russian_phone(phone):
@@ -20,19 +20,38 @@ def validate_russian_phone(phone):
     
     return False
 
-def get_available_spots_for_hour(booking_date, hour):
-    """Calculate available parking spots for a specific date and hour"""
+def get_available_spots_for_date(booking_date):
+    """Calculate available parking spots for a specific date"""
     settings = ParkingSettings.query.first()
     if not settings:
         return 0
-    # Count all bookings for this date and hour (учитываем диапазон)
+    
+    # Count all bookings for this date
     booked_spots = Booking.query.filter(
-        Booking.booking_date == booking_date,
-        Booking.booking_start_hour <= hour,
-        Booking.booking_end_hour >= hour
+        Booking.start_date <= booking_date,
+        Booking.end_date >= booking_date
     ).count()
+    
     available = settings.total_spots - settings.reserve_spots - booked_spots
     return max(0, available)
+
+def calculate_daily_price(total_days, vehicle_type='car'):
+    """Calculate price based on new tariff system"""
+    settings = ParkingSettings.query.first()
+    if not settings:
+        return 0
+    
+    if vehicle_type == 'minibus':
+        return settings.minibus_price * total_days
+    
+    # For cars: 1-25 days = 350р, 26+ days = 150р
+    if total_days <= 25:
+        return settings.daily_price_1_25 * total_days
+    else:
+        # First 25 days at 350р, remaining days at 150р
+        first_25_days = settings.daily_price_1_25 * 25
+        remaining_days = settings.daily_price_26_plus * (total_days - 25)
+        return first_25_days + remaining_days
 
 def format_phone_display(phone):
     """Format phone number for display"""

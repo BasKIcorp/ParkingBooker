@@ -1874,3 +1874,125 @@ footer p {
 .fade.show {
     opacity: 1;
 }
+
+/* Checkbox styles for minibus selection */
+.form-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    accent-color: #61AEEA;
+    cursor: pointer;
+}
+
+.form-group label[for="vehicle_type"] {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    color: #2C2C2C;
+}
+
+.form-group label[for="vehicle_type"] span {
+    margin-left: 8px;
+}
+
+/* Tariff sections */
+.tariff-section {
+    margin-bottom: 15px;
+}
+
+.tariff-section p {
+    font-weight: 600;
+    color: #2C2C2C;
+    margin-bottom: 8px;
+}
+
+.tariff-section ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.tariff-section li {
+    color: #666;
+    margin-bottom: 4px;
+}
+
+/* Agreement link in checkbox */
+.checkbox-group label a {
+    color: #61AEEA;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.checkbox-group label a:hover {
+    text-decoration: underline;
+}
+
+/* Footer styles */
+.footer {
+    background: #f8f9fa;
+    padding: 20px 0 0 0;
+    margin-top: 40px;
+    border-top: 1px solid #e9ecef;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 0 20px;
+    margin-bottom: 20px;
+}
+
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.footer-links a {
+    color: #61AEEA;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+.footer-links .separator {
+    color: #ccc;
+    font-size: 12px;
+}
+
+.footer-contact {
+    color: #666;
+    font-size: 14px;
+}
+
+.footer-bottom {
+    background: #e9ecef;
+    padding: 15px 0;
+    border-top: 1px solid #dee2e6;
+}
+
+.footer-bottom .container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-bottom p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.footer-bottom p:not(:last-child) {
+    margin-bottom: 5px;
+}
