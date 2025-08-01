@@ -208,10 +208,49 @@ function initializeFormValidation() {
     });
     
     form.addEventListener('submit', function(e) {
-        if (!validateForm()) {
-            e.preventDefault();
+        e.preventDefault();
+        
+        // Clear previous errors
+        clearAllFieldErrors();
+        
+        // Basic client-side validation
+        const clientErrors = validateForm();
+        if (!clientErrors) {
             showValidationNotification(['Пожалуйста, заполните все обязательные поля корректно']);
+            return;
         }
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Отправка...</span>';
+        
+        // Prepare form data
+        const formData = new FormData(form);
+        
+        // Send AJAX request
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Success - redirect to success page
+                window.location.href = data.redirect_url;
+            } else {
+                // Show server-side errors
+                showServerErrors(data.errors, data.field_errors);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showValidationNotification(['Произошла ошибка при отправке формы. Попробуйте еще раз.']);
+        })
+        .finally(() => {
+            // Reset button state
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i><span>Забронировать</span>';
+        });
     });
 }
 
@@ -382,6 +421,31 @@ function showValidationNotification(errors) {
             notification.remove();
         });
     }
+}
+
+function showServerErrors(errors, fieldErrors) {
+    // Show general errors
+    if (errors && errors.length > 0) {
+        showValidationNotification(errors);
+    }
+    
+    // Show field-specific errors
+    if (fieldErrors) {
+        Object.keys(fieldErrors).forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                showFieldError(field, fieldErrors[fieldId]);
+            }
+        });
+    }
+}
+
+function clearAllFieldErrors() {
+    const errorElements = document.querySelectorAll('.field-error');
+    errorElements.forEach(error => error.remove());
+    
+    const errorFields = document.querySelectorAll('.error');
+    errorFields.forEach(field => field.classList.remove('error'));
 }
 
 // Initialize when DOM is loaded
