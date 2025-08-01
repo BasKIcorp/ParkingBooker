@@ -1,30 +1,35 @@
 # syntax=docker/dockerfile:1
-FROM python:3.11-slim
+FROM python:3.11-alpine
 
-# Установка системных зависимостей с retry и альтернативными репозиториями
-RUN apt-get update --fix-missing && \
-    apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
+# Установка системных зависимостей
+RUN apk add --no-cache \
     gcc \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+    musl-dev \
+    libffi-dev \
+    openssl-dev \
+    curl
 
 # Создание пользователя для безопасности
-RUN useradd --create-home --shell /bin/bash app
+RUN adduser -D -s /bin/sh app
 
 WORKDIR /app
 
 # Копирование файлов зависимостей
 COPY pyproject.toml req.txt ./
 
-# Установка зависимостей с retry
-RUN pip install --upgrade pip --retries 3 && \
-    pip install poetry --retries 3 && \
-    poetry config virtualenvs.create false && \
-    poetry install --only=main --no-root --retries 3 && \
-    pip install -r req.txt --retries 3
+# Установка зависимостей
+#RUN pip install --upgrade pip && \
+#    pip install poetry && \
+#    poetry config virtualenvs.create false && \
+#    poetry install --only=main --no-root && \
+#    pip install -r req.txt
+
+RUN pip install --upgrade pip --timeout=60 --no-cache-dir \
+    && pip install poetry --no-cache-dir \
+    && poetry config virtualenvs.create false \
+    && poetry install --only=main --no-root \
+    && pip install -r req.txt --timeout=60 --no-cache-dir
+
 
 # Копирование кода приложения
 COPY . .
