@@ -5,8 +5,8 @@ from app import app
 def check_database_permissions():
     """Проверяет права доступа к базе данных при запуске"""
     db_paths = [
-        'instance/parking_booker.db',
-        'parking_booker.db',
+        'instance/parking.db',
+        'parking.db',
         'app.db'
     ]
     
