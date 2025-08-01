@@ -52,62 +52,40 @@ def book_parking():
 
         # Validation
         errors = []
-        field_errors = {}
-        
         if not first_name:
             errors.append('Имя обязательно для заполнения')
-            field_errors['first_name'] = 'Имя обязательно для заполнения'
         if not last_name:
             errors.append('Фамилия обязательна для заполнения')
-            field_errors['last_name'] = 'Фамилия обязательна для заполнения'
         if not phone:
             errors.append('Телефон обязателен для заполнения')
-            field_errors['phone'] = 'Телефон обязателен для заполнения'
         elif not validate_russian_phone(phone):
             errors.append('Неверный формат номера телефона')
-            field_errors['phone'] = 'Неверный формат номера телефона'
         if not start_date_str:
             errors.append('Дата начала обязательна')
-            field_errors['start_date'] = 'Дата начала обязательна'
         if not end_date_str:
             errors.append('Дата окончания обязательна')
-            field_errors['end_date'] = 'Дата окончания обязательна'
         if not data_consent:
             errors.append('Необходимо согласие на обработку данных')
-            field_errors['data_consent'] = 'Необходимо согласие на обработку данных'
-        
-        # If there are validation errors, return JSON response
         if errors:
-            return jsonify({
-                'success': False,
-                'errors': errors,
-                'field_errors': field_errors
-            }), 400
+            for error in errors:
+                flash(error, 'error')
+            return redirect(url_for('index'))
 
         # Parse and validate dates
         try:
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
         except (ValueError, TypeError):
-            return jsonify({
-                'success': False,
-                'errors': ['Неверный формат даты'],
-                'field_errors': {'start_date': 'Неверный формат даты', 'end_date': 'Неверный формат даты'}
-            }), 400
+            flash('Неверный формат даты', 'error')
+            return redirect(url_for('index'))
 
         now = date.today()
         if start_date < now:
-            return jsonify({
-                'success': False,
-                'errors': ['Дата начала не может быть в прошлом'],
-                'field_errors': {'start_date': 'Дата начала не может быть в прошлом'}
-            }), 400
+            flash('Дата начала не может быть в прошлом', 'error')
+            return redirect(url_for('index'))
         if end_date <= start_date:
-            return jsonify({
-                'success': False,
-                'errors': ['Дата окончания должна быть позже даты начала'],
-                'field_errors': {'end_date': 'Дата окончания должна быть позже даты начала'}
-            }), 400
+            flash('Дата окончания должна быть позже даты начала', 'error')
+            return redirect(url_for('index'))
 
         # Calculate total days
         total_days = (end_date - start_date).days + 1
@@ -120,11 +98,8 @@ def book_parking():
             check_date = start_date + timedelta(days=i)
             available_spots = get_available_spots_for_date(check_date)
             if available_spots <= 0:
-                return jsonify({
-                    'success': False,
-                    'errors': [f'Нет свободных мест на {check_date.strftime("%d.%m.%Y")}'],
-                    'field_errors': {'start_date': f'Нет свободных мест на {check_date.strftime("%d.%m.%Y")}'}
-                }), 400
+                flash(f'Нет свободных мест на {check_date.strftime("%d.%m.%Y")}', 'error')
+                return redirect(url_for('index'))
 
         # Create booking
         booking = Booking(
@@ -141,19 +116,12 @@ def book_parking():
         db.session.add(booking)
         db.session.commit()
         
-        return jsonify({
-            'success': True,
-            'booking_id': booking.id,
-            'redirect_url': url_for('success', booking_id=booking.id)
-        })
+        return redirect(url_for('success', booking_id=booking.id))
         
     except Exception as e:
         print(f"Error in booking: {e}")
-        return jsonify({
-            'success': False,
-            'errors': ['Произошла ошибка при бронировании'],
-            'field_errors': {}
-        }), 500
+        flash('Произошла ошибка при бронировании', 'error')
+        return redirect(url_for('index'))
 
 @app.route('/success/<int:booking_id>')
 def success(booking_id=None):

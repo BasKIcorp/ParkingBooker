@@ -1,31 +1,35 @@
 // Main JavaScript functionality for parking reservation system
 
 function initializeBookingForm() {
-    // Проверяем, что все необходимые элементы загружены
-    const requiredElements = [
-        'bookingForm',
-        'first_name',
-        'last_name',
-        'phone',
-        'start_date',
-        'end_date',
-        'data_consent'
-    ];
-    
-    const missingElements = requiredElements.filter(id => !document.getElementById(id));
-    if (missingElements.length > 0) {
-        console.warn('Не найдены элементы:', missingElements);
-        return;
+    try {
+        // Проверяем, что все необходимые элементы загружены
+        const requiredElements = [
+            'bookingForm',
+            'first_name',
+            'last_name',
+            'phone',
+            'start_date',
+            'end_date',
+            'data_consent'
+        ];
+        
+        const missingElements = requiredElements.filter(id => !document.getElementById(id));
+        if (missingElements.length > 0) {
+            console.warn('Не найдены элементы:', missingElements);
+            return;
+        }
+        
+        // Initialize date selection
+        initializeDateSelection();
+        // Initialize phone input formatting
+        initializePhoneFormatting();
+        // Initialize form validation
+        initializeFormValidation();
+        // Initialize vehicle type selection
+        initializeVehicleTypeSelection();
+    } catch (e) {
+        console.error('Ошибка при инициализации формы бронирования:', e);
     }
-    
-    // Initialize date selection
-    initializeDateSelection();
-    // Initialize phone input formatting
-    initializePhoneFormatting();
-    // Initialize form validation
-    initializeFormValidation();
-    // Initialize vehicle type selection
-    initializeVehicleTypeSelection();
 }
 
 function initializeVehicleTypeSelection() {
@@ -194,64 +198,41 @@ function calculateAndDisplayPrice(totalDays, vehicleType) {
 }
 
 function initializeFormValidation() {
-    const form = document.getElementById('bookingForm');
-    const submitBtn = document.getElementById('submitBtn');
-    
-    if (!form || !submitBtn) return;
-    
-    form.addEventListener('input', function() {
-        if (validateForm()) {
-            submitBtn.disabled = false;
-        } else {
-            submitBtn.disabled = true;
-        }
-    });
-    
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
+    try {
+        const form = document.getElementById('bookingForm');
+        const submitBtn = document.getElementById('submitBtn');
         
-        // Clear previous errors
-        clearAllFieldErrors();
-        
-        // Basic client-side validation
-        const clientErrors = validateForm();
-        if (!clientErrors) {
-            showValidationNotification(['Пожалуйста, заполните все обязательные поля корректно']);
+        if (!form || !submitBtn) {
+            console.warn('Форма или кнопка отправки не найдены');
             return;
         }
         
-        // Show loading state
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Отправка...</span>';
-        
-        // Prepare form data
-        const formData = new FormData(form);
-        
-        // Send AJAX request
-        fetch(form.action, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Success - redirect to success page
-                window.location.href = data.redirect_url;
-            } else {
-                // Show server-side errors
-                showServerErrors(data.errors, data.field_errors);
+        form.addEventListener('input', function() {
+            try {
+                if (validateForm()) {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
+            } catch (e) {
+                console.error('Ошибка при валидации формы:', e);
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showValidationNotification(['Произошла ошибка при отправке формы. Попробуйте еще раз.']);
-        })
-        .finally(() => {
-            // Reset button state
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i><span>Забронировать</span>';
         });
-    });
+        
+        form.addEventListener('submit', function(e) {
+            try {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    showValidationNotification(['Пожалуйста, заполните все обязательные поля корректно']);
+                }
+            } catch (e) {
+                console.error('Ошибка при отправке формы:', e);
+                e.preventDefault();
+            }
+        });
+    } catch (e) {
+        console.error('Ошибка при инициализации валидации формы:', e);
+    }
 }
 
 function validateForm() {
@@ -269,7 +250,10 @@ function validateForm() {
         // Check required fields
         requiredFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
-            if (!field) return; // Пропускаем если поле не найдено
+            if (!field) {
+                console.warn('Поле не найдено:', fieldId);
+                return; // Пропускаем если поле не найдено
+            }
             
             const fieldValue = field.value || '';
             if (!fieldValue.trim()) {
@@ -284,9 +268,14 @@ function validateForm() {
                     }
                 }
                 
+                // Дополнительная проверка на случай, если label все еще null
+                if (!label) {
+                    console.warn('Label не найден для поля:', fieldId);
+                }
+                
                 // Получаем текст label или используем fallback с дополнительными проверками
                 let fieldName = fieldId; // fallback
-                if (label && label.textContent) {
+                if (label && label.textContent && typeof label.textContent === 'string') {
                     fieldName = label.textContent.replace('*', '').trim();
                 }
                 
@@ -359,7 +348,10 @@ function validatePhoneNumber(phone) {
 }
 
 function showFieldError(field, message) {
-    if (!field) return;
+    if (!field || !field.parentNode) {
+        console.warn('showFieldError: поле или его родитель не найдены');
+        return;
+    }
     
     hideFieldError(field);
     
@@ -367,108 +359,123 @@ function showFieldError(field, message) {
     errorDiv.className = 'field-error';
     errorDiv.textContent = message;
     
-    if (field.parentNode) {
+    try {
         field.parentNode.appendChild(errorDiv);
         field.classList.add('error');
+    } catch (e) {
+        console.error('Ошибка при добавлении ошибки поля:', e);
     }
 }
 
 function hideFieldError(field) {
     if (!field || !field.parentNode) return;
     
-    const existingError = field.parentNode.querySelector('.field-error');
-    if (existingError) {
-        existingError.remove();
+    try {
+        const existingError = field.parentNode.querySelector('.field-error');
+        if (existingError) {
+            existingError.remove();
+        }
+        field.classList.remove('error');
+    } catch (e) {
+        console.error('Ошибка при скрытии ошибки поля:', e);
     }
-    field.classList.remove('error');
 }
 
 function showValidationNotification(errors) {
     if (!errors || errors.length === 0) return;
     
-    // Remove existing notifications
-    const existingNotifications = document.querySelectorAll('.validation-notification');
-    existingNotifications.forEach(notification => notification.remove());
-    
-    // Create new notification
-    const notification = document.createElement('div');
-    notification.className = 'validation-notification error';
-    notification.innerHTML = `
-        <div class="notification-content">
-            <h4>Ошибки в форме:</h4>
-            <ul>
-                ${errors.map(error => `<li>${error}</li>`).join('')}
-            </ul>
-            <button type="button" class="close-notification">&times;</button>
-        </div>
-    `;
-    
-    if (document.body) {
-        document.body.appendChild(notification);
+    try {
+        // Remove existing notifications
+        const existingNotifications = document.querySelectorAll('.validation-notification');
+        existingNotifications.forEach(notification => {
+            try {
+                notification.remove();
+            } catch (e) {
+                console.warn('Ошибка при удалении уведомления:', e);
+            }
+        });
+        
+        // Create new notification
+        const notification = document.createElement('div');
+        notification.className = 'validation-notification error';
+        notification.innerHTML = `
+            <div class="notification-content">
+                <h4>Ошибки в форме:</h4>
+                <ul>
+                    ${errors.map(error => `<li>${error}</li>`).join('')}
+                </ul>
+                <button type="button" class="close-notification">&times;</button>
+            </div>
+        `;
+        
+        if (document.body) {
+            document.body.appendChild(notification);
+        }
+    } catch (e) {
+        console.error('Ошибка при создании уведомления:', e);
     }
     
     // Auto-remove after 5 seconds
     setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
+        try {
+            if (notification && notification.parentNode) {
+                notification.remove();
+            }
+        } catch (e) {
+            console.warn('Ошибка при автоматическом удалении уведомления:', e);
         }
     }, 5000);
     
     // Close button functionality
-    const closeBtn = notification.querySelector('.close-notification');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            notification.remove();
-        });
+    try {
+        const closeBtn = notification.querySelector('.close-notification');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                try {
+                    notification.remove();
+                } catch (e) {
+                    console.warn('Ошибка при закрытии уведомления:', e);
+                }
+            });
+        }
+    } catch (e) {
+        console.warn('Ошибка при настройке кнопки закрытия:', e);
     }
-}
-
-function showServerErrors(errors, fieldErrors) {
-    // Show general errors
-    if (errors && errors.length > 0) {
-        showValidationNotification(errors);
-    }
-    
-    // Show field-specific errors
-    if (fieldErrors) {
-        Object.keys(fieldErrors).forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (field) {
-                showFieldError(field, fieldErrors[fieldId]);
-            }
-        });
-    }
-}
-
-function clearAllFieldErrors() {
-    const errorElements = document.querySelectorAll('.field-error');
-    errorElements.forEach(error => error.remove());
-    
-    const errorFields = document.querySelectorAll('.error');
-    errorFields.forEach(field => field.classList.remove('error'));
 }
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Попытка инициализации сразу
-    initializeBookingForm();
-    
-    // Если элементы не найдены, попробуем еще раз через небольшую задержку
-    setTimeout(() => {
-        const form = document.getElementById('bookingForm');
-        if (!form) {
-            console.warn('Форма не найдена, повторная попытка инициализации...');
-            initializeBookingForm();
-        }
-    }, 100);
-    
-    // Финальная попытка через 1 секунду
-    setTimeout(() => {
-        const form = document.getElementById('bookingForm');
-        if (!form) {
-            console.error('Форма не найдена после всех попыток');
-        }
-    }, 1000);
+    try {
+        // Попытка инициализации сразу
+        initializeBookingForm();
+        
+        // Если элементы не найдены, попробуем еще раз через небольшую задержку
+        setTimeout(() => {
+            try {
+                const form = document.getElementById('bookingForm');
+                if (!form) {
+                    console.warn('Форма не найдена, повторная попытка инициализации...');
+                    initializeBookingForm();
+                }
+            } catch (e) {
+                console.error('Ошибка при повторной инициализации:', e);
+            }
+        }, 100);
+        
+        // Финальная попытка через 1 секунду
+        setTimeout(() => {
+            try {
+                const form = document.getElementById('bookingForm');
+                if (!form) {
+                    console.error('Форма не найдена после всех попыток');
+                }
+            } catch (e) {
+                console.error('Ошибка при финальной проверке формы:', e);
+            }
+        }, 1000);
+    } catch (e) {
+        console.error('Ошибка при инициализации приложения:', e);
+    }
 });
 
 // Make functions globally available
