@@ -121,7 +121,7 @@
             
             <div class="form-group full-width">
               <label for="vehicle_type">
-                <input type="checkbox" id="is_minibus" name="is_minibus" value="1">
+                <input type="checkbox" id="is_minibus" name="is_minibus" value="1" onchange="updatePriceCalculation()">
                 <span>Микроавтобус</span>
               </label>
               <input type="hidden" id="vehicle_type" name="vehicle_type" value="car">
@@ -131,14 +131,14 @@
               <div class="form-group">
                 <label for="start_date">Дата заезда*</label>
                 <div class="input-with-icon">
-                  <input type="date" id="start_date" name="start_date" min="{{ today }}" required>
+                  <input type="date" id="start_date" name="start_date" min="{{ today }}" required onchange="updatePriceCalculation()">
                   <i class="fas fa-calendar"></i>
                 </div>
               </div>
               <div class="form-group">
                 <label for="end_date">Дата выезда*</label>
                 <div class="input-with-icon">
-                  <input type="date" id="end_date" name="end_date" min="{{ today }}" required>
+                  <input type="date" id="end_date" name="end_date" min="{{ today }}" required onchange="updatePriceCalculation()">
                   <i class="fas fa-calendar"></i>
                 </div>
               </div>

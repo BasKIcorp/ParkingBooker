@@ -88,25 +88,54 @@ function initializePhoneFormatting() {
     const phoneInput = document.getElementById('phone');
     phoneInput.addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
-        // Handle different starting digits
+        
+        // Если номер начинается с 8, заменяем на 7
         if (value.startsWith('8')) {
             value = '7' + value.substring(1);
         }
         
-            if (value.length > 0) {
+        // Если номер 10 цифр и не начинается с 7 или 8, добавляем 7 в начало
+        if (value.length === 10 && !value.startsWith('7') && !value.startsWith('8')) {
+            value = '7' + value;
+        }
+        
+        // Форматируем номер только если он начинается с 7
+        if (value.length > 0 && value.startsWith('7')) {
             if (value.length <= 3) {
-                value = '+7 (' + value;
+                value = '+7 (' + value.substring(1);
             } else if (value.length <= 6) {
-                value = '+7 (' + value.substring(0, 3) + ') ' + value.substring(3);
+                value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4);
             } else if (value.length <= 8) {
-                value = '+7 (' + value.substring(0, 3) + ') ' + value.substring(3, 6) + '-' + value.substring(6);
+                value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4, 7) + '-' + value.substring(7);
+            } else if (value.length <= 10) {
+                value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4, 7) + '-' + value.substring(7, 9) + '-' + value.substring(9);
             } else {
-                value = '+7 (' + value.substring(0, 3) + ') ' + value.substring(3, 6) + '-' + value.substring(6, 8) + '-' + value.substring(8, 10);
+                value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4, 7) + '-' + value.substring(7, 9) + '-' + value.substring(9, 11);
             }
+        } else if (value.length > 0) {
+            // Если номер не начинается с 7, оставляем как есть
+            value = value;
         }
         
         e.target.value = value;
     });
+}
+
+function updatePriceCalculation() {
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    const isMinibusCheckbox = document.getElementById('is_minibus');
+    
+    if (startDateInput.value && endDateInput.value) {
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+        const vehicleType = isMinibusCheckbox.checked ? 'minibus' : 'car';
+        
+        if (endDate > startDate) {
+            const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            calculateAndDisplayPrice(daysDiff, vehicleType);
+        }
+    }
 }
 
 function calculateAndDisplayPrice(totalDays, vehicleType) {
@@ -229,11 +258,12 @@ function validatePhoneNumber(phone) {
     // Remove all non-digit characters
     const digits = phone.replace(/\D/g, '');
     
-    // Russian phone patterns
+    // Russian phone patterns - более гибкие
     const patterns = [
         /^7\d{10}$/,     // +7XXXXXXXXXX
         /^8\d{10}$/,     // 8XXXXXXXXXX
-        /^\d{10}$/       // XXXXXXXXXX (assume Russian)
+        /^\d{10}$/,      // XXXXXXXXXX (assume Russian)
+        /^\d{11}$/       // 11 цифр (с кодом страны)
     ];
     
     return patterns.some(pattern => pattern.test(digits));
@@ -295,3 +325,7 @@ function showValidationNotification(errors) {
 document.addEventListener('DOMContentLoaded', function() {
         initializeBookingForm();
 });
+
+// Make functions globally available
+window.updatePriceCalculation = updatePriceCalculation;
+window.calculateAndDisplayPrice = calculateAndDisplayPrice;
