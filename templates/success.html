@@ -22,7 +22,7 @@
         <div class="contact-info">
           <div class="phone-section">
             <i class="fas fa-phone"></i>
-                            <span>+7(925)111-26-76</span>
+            <span>+7(925)111-26-76</span>
           </div>
           <p>Работаем круглосуточно</p>
         </div>
@@ -42,9 +42,17 @@
           </div>
           <h2>Бронирование успешно!</h2>
           <p>Ваше парковочное место забронировано</p>
+          
+          {% if is_temp %}
+          <div class="temp-booking-notice">
+            <i class="fas fa-info-circle"></i>
+            <p>Внимание: Это предварительное бронирование. Обратитесь к администратору для подтверждения.</p>
+          </div>
+          {% endif %}
         </div>
 
         <!-- Booking details -->
+        {% if booking %}
         <div class="booking-details-card">
           <h3>Детали бронирования</h3>
           <div class="details-grid">
@@ -88,7 +96,7 @@
                 <span>Дата заезда</span>
               </div>
               <div class="detail-value">
-                {{ booking.start_date.strftime('%d.%m.%Y') }}
+                {{ booking.start_date.strftime('%d.%m.%Y') if booking.start_date is not string else booking.start_date }}
               </div>
             </div>
             
@@ -98,7 +106,7 @@
                 <span>Дата выезда</span>
               </div>
               <div class="detail-value">
-                {{ booking.end_date.strftime('%d.%m.%Y') }}
+                {{ booking.end_date.strftime('%d.%m.%Y') if booking.end_date is not string else booking.end_date }}
               </div>
             </div>
             
@@ -133,8 +141,16 @@
             </div>
           </div>
         </div>
-
-
+        {% else %}
+        <div class="booking-details-card">
+          <h3>Информация о бронировании</h3>
+          <div class="temp-booking-info">
+            <p><i class="fas fa-info-circle"></i> Ваше бронирование принято в обработку.</p>
+            <p>Наш администратор свяжется с вами для подтверждения деталей.</p>
+            <p>Для связи используйте номер: <strong>+7(925)111-26-76</strong></p>
+          </div>
+        </div>
+        {% endif %}
 
         <!-- Action buttons -->
         <div class="action-buttons">

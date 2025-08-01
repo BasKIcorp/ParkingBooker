@@ -19,6 +19,14 @@ services:
       retries: 3
     networks:
       - app-network
+    # Добавляем команду для инициализации БД
+    command: >
+      sh -c "
+        echo '🔧 Инициализация базы данных...' &&
+        python fix_database_permissions.py &&
+        echo '✅ База данных готова' &&
+        gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 120 app:app
+      "
 
   nginx:
     build:
