@@ -18,18 +18,11 @@ WORKDIR /app
 COPY pyproject.toml req.txt ./
 
 # Установка зависимостей
-#RUN pip install --upgrade pip && \
-#    pip install poetry && \
-#    poetry config virtualenvs.create false && \
-#    poetry install --only=main --no-root && \
-#    pip install -r req.txt
-
-RUN pip install --upgrade pip --timeout=60 --no-cache-dir \
-    && pip install poetry --no-cache-dir \
-    && poetry config virtualenvs.create false \
-    && poetry install --only=main --no-root \
-    && pip install -r req.txt --timeout=60 --no-cache-dir
-
+RUN pip install --upgrade pip && \
+    pip install poetry && \
+    poetry config virtualenvs.create false && \
+    poetry install --only=main --no-root && \
+    pip install -r req.txt
 
 # Копирование кода приложения
 COPY . .
