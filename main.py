@@ -1,6 +1,14 @@
 import os
 import stat
-from app import app
+
+try:
+    from app import app
+    print("=== APP IMPORTED SUCCESSFULLY ===")
+except Exception as e:
+    print(f"=== ERROR IMPORTING APP: {e} ===")
+    import traceback
+    traceback.print_exc()
+    exit(1)
 
 def check_database_permissions():
     """Проверяет права доступа к базе данных при запуске"""

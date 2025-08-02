@@ -47,4 +47,10 @@ with app.app_context():
         db.session.commit()
 
 # Import routes
-import routes  # noqa: F401
+try:
+    import routes  # noqa: F401
+    print("=== ROUTES IMPORTED SUCCESSFULLY ===")
+except Exception as e:
+    print(f"=== ERROR IMPORTING ROUTES: {e} ===")
+    import traceback
+    traceback.print_exc()

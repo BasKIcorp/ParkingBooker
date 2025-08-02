@@ -1,11 +1,18 @@
 import os
 from datetime import datetime, date, timedelta
 from flask import render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
+from werkzeug.datastructures import ImmutableMultiDict
 from app import app, db
 from models import Booking, ParkingSettings, AdminUser
 from utils import get_available_spots_for_date, validate_russian_phone, calculate_daily_price
-import time
+import logging
 
+# Настройка логирования
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+print("=== ROUTES.PY LOADED ===")
+print(f"App routes: {[str(rule) for rule in app.url_map.iter_rules()]}")
 
 @app.route('/')
 def index():
@@ -36,98 +43,91 @@ def index():
 
 @app.route('/book_parking', methods=['POST'])
 def book_parking():
-    """Handle parking booking"""
+    """Handle booking form submission (daily booking)"""
+    import sys
+    print("=== FUNCTION CALLED ===", file=sys.stderr)
+    logger.info("=== FUNCTION CALLED ===")
+    
     try:
+        logger.info("=== BOOKING REQUEST START ===")
+        logger.info(f"Form data: {request.form}")
+        logger.info("About to enter try block...")
+        
         # Get form data
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
         phone = request.form.get('phone', '').strip()
-        vehicle_type = request.form.get('vehicle_type', 'car')
-        start_date_str = request.form.get('start_date')
-        end_date_str = request.form.get('end_date')
+        is_minibus = request.form.get('is_minibus') == '1'
+        vehicle_type = 'minibus' if is_minibus else 'car'
+        start_date_str = request.form.get('start_date', '').strip()
+        end_date_str = request.form.get('end_date', '').strip()
+        data_consent = request.form.get('data_consent')
+
+        logger.info(f"Parsed data: first_name='{first_name}', last_name='{last_name}', phone='{phone}', vehicle_type='{vehicle_type}', start_date='{start_date_str}', end_date='{end_date_str}', data_consent='{data_consent}'")
+
+        # Validation
+        errors = []
+        logger.info("Starting validation...")
+        if not first_name:
+            errors.append('Имя обязательно для заполнения')
+        if not last_name:
+            errors.append('Фамилия обязательна для заполнения')
+        if not phone:
+            errors.append('Телефон обязателен для заполнения')
+        elif not validate_russian_phone(phone):
+            errors.append('Неверный формат номера телефона')
+        if not start_date_str:
+            errors.append('Дата начала обязательна')
+        if not end_date_str:
+            errors.append('Дата окончания обязательна')
+        if not data_consent:
+            errors.append('Необходимо согласие на обработку данных')
         
-        # Validate required fields
-        if not all([first_name, last_name, phone, start_date_str, end_date_str]):
-            flash('Пожалуйста, заполните все обязательные поля', 'error')
+        logger.info(f"Validation errors: {errors}")
+        if errors:
+            for error in errors:
+                flash(error, 'error')
             return redirect(url_for('index'))
-        
-        # Parse dates
+
+        # Parse and validate dates
         try:
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
-        except ValueError:
+            logger.info(f"Parsed dates: start_date={start_date}, end_date={end_date}")
+        except (ValueError, TypeError) as e:
+            logger.error(f"Date parsing error: {e}")
             flash('Неверный формат даты', 'error')
             return redirect(url_for('index'))
-        
-        # Validate dates
-        today = date.today()
-        if start_date < today:
-            flash('Дата заезда не может быть в прошлом', 'error')
+
+        now = date.today()
+        if start_date < now:
+            logger.warning(f"Start date {start_date} is in the past")
+            flash('Дата начала не может быть в прошлом', 'error')
             return redirect(url_for('index'))
-        
         if end_date <= start_date:
-            flash('Дата выезда должна быть позже даты заезда', 'error')
+            logger.warning(f"End date {end_date} is not after start date {start_date}")
+            flash('Дата окончания должна быть позже даты начала', 'error')
             return redirect(url_for('index'))
-        
-        # Calculate total days and amount
-        total_days = (end_date - start_date).days
-        
-        # Get pricing settings
-        settings = ParkingSettings.query.first()
-        if not settings:
-            # Create default settings if not exists
-            try:
-                settings = ParkingSettings()
-                db.session.add(settings)
-                db.session.commit()
-            except Exception as e:
-                # Если не удается создать настройки, используем значения по умолчанию
-                settings = None
+
+        # Calculate total days
+        total_days = (end_date - start_date).days + 1
+        logger.info(f"Total days: {total_days}")
         
         # Calculate total amount
-        if vehicle_type == 'minibus':
-            daily_price = settings.minibus_price if settings else 700.0
-        else:
-            if total_days <= 25:
-                daily_price = settings.daily_price_1_25 if settings else 350.0
-            else:
-                # Сложный расчет для 26+ дней
-                first_25_days = (settings.daily_price_1_25 if settings else 350.0) * 25
-                remaining_days = (settings.daily_price_26_plus if settings else 150.0) * (total_days - 25)
-                total_amount = first_25_days + remaining_days
-                # Перенаправляем на страницу успеха с временными данными
-                return redirect(url_for('success', booking_id='temp_' + str(int(time.time()))))
+        total_amount = calculate_daily_price(total_days, vehicle_type)
+        logger.info(f"Total amount: {total_amount}")
         
-        total_amount = daily_price * total_days
-        
-        # Check availability for the date range
-        conflicting_bookings = Booking.query.filter(
-            Booking.start_date <= end_date,
-            Booking.end_date >= start_date
-        ).count()
-        
-        # Get total spots from settings
-        total_spots = settings.total_spots if settings else 50
-        available_spots = total_spots - conflicting_bookings
-        
-        if available_spots <= 0:
-            # Вместо ошибки, показываем успешное бронирование с предупреждением
-            flash(f'Внимание: На выбранные даты может быть ограниченная доступность мест', 'warning')
-            # Создаем временное бронирование для отображения
-            temp_booking = {
-                'id': 'temp_' + str(int(time.time())),
-                'first_name': first_name,
-                'last_name': last_name,
-                'phone': phone,
-                'vehicle_type': vehicle_type,
-                'start_date': start_date,
-                'end_date': end_date,
-                'total_days': total_days,
-                'total_amount': total_amount,
-                'created_at': datetime.now()
-            }
-            return render_template('success.html', booking=temp_booking, is_temp=True)
+        # Check availability for all dates
+        for i in range(total_days):
+            check_date = start_date + timedelta(days=i)
+            available_spots = get_available_spots_for_date(check_date)
+            logger.info(f"Available spots for {check_date}: {available_spots}")
+            if available_spots <= 0:
+                logger.warning(f"No available spots for {check_date}")
+                flash(f'Нет свободных мест на {check_date.strftime("%d.%m.%Y")}', 'error')
+                return redirect(url_for('index'))
 
+        logger.info("Creating booking object...")
         # Create booking
         booking = Booking(
             first_name=first_name,
@@ -140,72 +140,48 @@ def book_parking():
             total_amount=total_amount
         )
         
+        logger.info("Adding booking to session...")
         db.session.add(booking)
         try:
+            logger.info("Committing to database...")
             db.session.commit()
-            return redirect(url_for('success', booking_id=booking.id))
+            logger.info(f"Booking created successfully with ID: {booking.id}")
         except Exception as e:
+            logger.error(f"Database error: {e}")
             db.session.rollback()
             error_msg = str(e)
-            # Вместо показа ошибки, создаем временное бронирование
-            print(f"Database error: {error_msg}")
-            temp_booking = {
-                'id': 'temp_' + str(int(time.time())),
-                'first_name': first_name,
-                'last_name': last_name,
-                'phone': phone,
-                'vehicle_type': vehicle_type,
-                'start_date': start_date,
-                'end_date': end_date,
-                'total_days': total_days,
-                'total_amount': total_amount,
-                'created_at': datetime.now()
-            }
-            flash('Бронирование создано! Обратитесь к администратору для подтверждения.', 'success')
-            return render_template('success.html', booking=temp_booking, is_temp=True)
+            if 'readonly database' in error_msg.lower():
+                flash('Ошибка: База данных доступна только для чтения. Обратитесь к администратору. Для исправления запустите: python fix_database_permissions.py', 'error')
+            elif 'permission denied' in error_msg.lower():
+                flash('Ошибка: Отказано в доступе к базе данных. Обратитесь к администратору. Проверьте права доступа к файлу базы данных.', 'error')
+            elif 'database is locked' in error_msg.lower():
+                flash('Ошибка: База данных заблокирована. Попробуйте перезапустить приложение.', 'error')
+            else:
+                flash(f'Ошибка при сохранении бронирования: {error_msg}', 'error')
+            return redirect(url_for('index'))
+        
+        logger.info("Redirecting to success page...")
+        return redirect(url_for('success', booking_id=booking.id))
         
     except Exception as e:
-        print(f"Error in booking: {e}")
-        # Вместо ошибки, создаем временное бронирование
-        temp_booking = {
-            'id': 'temp_' + str(int(time.time())),
-            'first_name': request.form.get('first_name', ''),
-            'last_name': request.form.get('last_name', ''),
-            'phone': request.form.get('phone', ''),
-            'vehicle_type': request.form.get('vehicle_type', 'car'),
-            'start_date': date.today(),
-            'end_date': date.today(),
-            'total_days': 1,
-            'total_amount': 0,
-            'created_at': datetime.now()
-        }
-        flash('Бронирование создано! Обратитесь к администратору для подтверждения.', 'success')
-        return render_template('success.html', booking=temp_booking, is_temp=True)
+        logger.error(f"Unexpected error in booking: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        flash(f'Произошла ошибка при бронировании: {str(e)}', 'error')
+        return redirect(url_for('index'))
 
-@app.route('/success/<booking_id>')
+@app.route('/success/<int:booking_id>')
 def success(booking_id=None):
     """Success page after booking"""
     if not booking_id:
         return redirect(url_for('index'))
     
-    # Проверяем, является ли это временным бронированием
-    if isinstance(booking_id, str) and booking_id.startswith('temp_'):
-        # Это временное бронирование, данные должны быть переданы через flash или session
-        flash('Бронирование создано! Обратитесь к администратору для подтверждения.', 'success')
-        return render_template('success.html', booking=None, is_temp=True)
+    booking = Booking.query.get(booking_id)
+    if not booking:
+        flash('Бронирование не найдено', 'error')
+        return redirect(url_for('index'))
     
-    # Обычное бронирование из базы данных
-    try:
-        booking = Booking.query.get(booking_id)
-        if not booking:
-            flash('Бронирование не найдено', 'error')
-            return redirect(url_for('index'))
-        
-        return render_template('success.html', booking=booking, is_temp=False)
-    except Exception as e:
-        print(f"Error loading booking: {e}")
-        flash('Бронирование создано! Обратитесь к администратору для подтверждения.', 'success')
-        return render_template('success.html', booking=None, is_temp=True)
+    return render_template('success.html', booking=booking)
 
 @app.route('/admin')
 def admin_panel():
