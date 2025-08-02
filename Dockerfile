@@ -28,10 +28,12 @@ RUN pip install --upgrade pip && \
 COPY . .
 
 # Создание директории для базы данных
-RUN mkdir -p instance && chown -R app:app /app
+#RUN mkdir -p instance && chown -R app:app /app
 
-# Переключение на пользователя app
-USER app
+# Создаем директорию и передаем права
+RUN mkdir -p /app/instance && \
+    chown -R app:app /app/instance && \
+    chmod -R 777 /app/instance
 
 # Переменные окружения
 ENV FLASK_APP=app.py
@@ -42,4 +44,7 @@ ENV PYTHONPATH=/app
 EXPOSE 5000
 
 # Использование gunicorn для продакшена
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "120", "app:app"] 
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--timeout", "120", "--log-level", "debug", "app:app"]
+
+# Отладочный режим - запускаем от root для решения проблем с правами
+##CMD ["python", "main.py"] 

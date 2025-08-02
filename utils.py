@@ -4,8 +4,10 @@ from models import Booking, ParkingSettings
 
 def validate_russian_phone(phone):
     """Validate Russian phone number formats"""
+    print(f"Validating phone: {repr(phone)}")
     # Remove all non-digit characters
     phone_digits = re.sub(r'\D', '', phone)
+    print(f"Phone digits: {phone_digits}")
     
     # Russian phone patterns
     patterns = [
@@ -16,8 +18,10 @@ def validate_russian_phone(phone):
     
     for pattern in patterns:
         if re.match(pattern, phone_digits):
+            print(f"Phone matches pattern: {pattern}")
             return True
     
+    print("Phone does not match any pattern")
     return False
 
 def get_available_spots_for_date(booking_date):
