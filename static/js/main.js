@@ -167,9 +167,9 @@ function calculateAndDisplayPrice(totalDays, vehicleType) {
     const finalPriceValue = document.getElementById('finalPriceValue');
     
     // Get settings from data attributes or use defaults
-    const dailyPrice1_25 = 350; // 1-25 сутки
-    const dailyPrice26_plus = 150; // 26+ сутки
-    const minibusPrice = 700; // Микроавтобус
+    const dailyPrice1_25 = parseInt(document.body.dataset.dailyPrice1_25) || 300; // 1-25 сутки
+    const dailyPrice26_plus = parseInt(document.body.dataset.dailyPrice26_plus) || 150; // 26+ сутки
+    const minibusPrice = parseInt(document.body.dataset.minibusPrice) || 500; // Микроавтобус
     
     let totalPrice = 0;
     let dailyPriceText = '';

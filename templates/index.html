@@ -1,347 +1,733 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="ru">
 
-{% block title %}Охрана и видеонаблюдение на парковке Шереметьево{% endblock %}
-
-{% block content %}
-<!-- Main container with background -->
-<div class="main-container">
-  <!-- Header section -->
-  <header class="main-header">
-    <div class="header-content">
-      <div class="header-left">
-        <div class="header-title">
-          <h1>Охрана и видеонаблюдение</h1>
-          <p>на парковке Шереметьево</p>
-        </div>
-        <div class="header-info">
-          <p>Парковка в 5 минутах от аэропорта</p>
-          <p>Бесплатный трансфер в терминалы B,C</p>
-        </div>
-      </div>
-      <div class="header-right">
-        <div class="contact-info">
-          <div class="phone-section">
-            <i class="fas fa-phone"></i>
-                            <span>+7(925)111-26-76</span>
-          </div>
-          <p>Работаем круглосуточно</p>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main content section -->
-  <div class="main-content">
-    <!-- Hero section with form and description in one block -->
-    <div class="hero-section">
-      <div class="hero-content">
-        <!-- Left side with security features -->
-        <div class="security-content">
-          <div class="security-header">
-            <h2>Охрана и видеонаблюдение</h2>
-            <p>на парковке Шереметьево</p>
-          </div>
-          
-          <div class="security-features">
-            <div class="feature-item">
-              <div class="feature-icon">
-                <i class="fas fa-user-shield"></i>
-              </div>
-              <div class="feature-text">
-                <h3>Лицензированные охранники</h3>
-                <p>круглосуточно</p>
-              </div>
-            </div>
-            
-            <div class="feature-item">
-              <div class="feature-icon">
-                <i class="fas fa-shield-alt"></i>
-              </div>
-              <div class="feature-text">
-                <h3>Высокий забор по периметру</h3>
-              </div>
-            </div>
-            
-            <div class="feature-item">
-              <div class="feature-icon">
-                <i class="fas fa-video"></i>
-              </div>
-              <div class="feature-text">
-                <h3>Система видеонаблюдения</h3>
-                <p>с постоянной записью</p>
-              </div>
-            </div>
-            
-            <div class="feature-item">
-              <div class="feature-icon">
-                <i class="fas fa-eye"></i>
-              </div>
-              <div class="feature-text">
-                <h3>Мониторинг территории</h3>
-                <p>в реальном времени</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right side with booking form -->
-        <div class="booking-content">
-          <h3>Форма бронирования</h3>
-          <div class="price-info" id="priceInfo">
-            <h4>Тарифы:</h4>
-            <div id="carTariffs" class="tariff-section">
-              <ul>
-                <li>1-25 сутки: {{ settings.daily_price_1_25 }} ₽/сутки</li>
-                <li>26+ сутки: {{ settings.daily_price_26_plus }} ₽/сутки</li>
-              </ul>
-            </div>
-            <div id="minibusTariffs" class="tariff-section" style="display: none;">
-              <ul>
-                <li>{{ settings.minibus_price }} ₽/сутки</li>
-              </ul>
-            </div>
-          </div>
-          
-          <form id="bookingForm" method="POST" action="{{ url_for('book_parking') }}" class="booking-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="first_name">Имя*</label>
-                <input type="text" id="first_name" name="first_name" placeholder="Иван" required>
-              </div>
-              <div class="form-group">
-                <label for="last_name">Фамилия*</label>
-                <input type="text" id="last_name" name="last_name" placeholder="Иванов" required>
-              </div>
-            </div>
-            
-            <div class="form-group full-width">
-              <label for="phone">Номер телефона*</label>
-              <input type="tel" id="phone" name="phone" placeholder="+7 (000) 000-00-00" required>
-            </div>
-            
-            <div class="form-group full-width">
-              <label for="vehicle_type">
-                <input type="checkbox" id="is_minibus" name="is_minibus" value="1" onchange="updatePriceCalculation()">
-                <span>Микроавтобус</span>
-              </label>
-              <input type="hidden" id="vehicle_type" name="vehicle_type" value="car">
-            </div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label for="start_date">Дата заезда*</label>
-                <div class="input-with-icon">
-                  <input type="date" id="start_date" name="start_date" min="{{ today }}" required onchange="updatePriceCalculation()">
-                  <i class="fas fa-calendar"></i>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="end_date">Дата выезда*</label>
-                <div class="input-with-icon">
-                  <input type="date" id="end_date" name="end_date" min="{{ today }}" required onchange="updatePriceCalculation()">
-                  <i class="fas fa-calendar"></i>
-                </div>
-              </div>
-            </div>
-            
-            <div class="time-display">
-              <p>Выберите даты заезда и выезда</p>
-            </div>
-            
-            <!-- Final price calculation -->
-            <div id="finalPrice" class="final-price-block" style="display: none;">
-              <div class="price-calculation">
-                <div class="price-row">
-                  <span>Количество суток:</span>
-                  <span id="totalDays">0</span>
-                </div>
-                <div class="price-row">
-                  <span>Тип транспорта:</span>
-                  <span id="vehicleTypeDisplay">Легковой автомобиль</span>
-                </div>
-                <div class="price-row">
-                  <span>Стоимость за сутки:</span>
-                  <span id="dailyPrice">0 ₽</span>
-                </div>
-                <div class="price-row total">
-                  <span>Итого к оплате:</span>
-                  <span id="finalPriceValue">0 ₽</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="form-actions">
-              <div class="checkbox-group">
-                <input type="checkbox" id="data_consent" name="data_consent" required>
-                <label for="data_consent">
-                  Я согласен на обработку персональных данных и принимаю 
-                  <a href="/agreement.pdf" target="_blank">пользовательское соглашение</a>*
-                </label>
-              </div>
-              
-              <button type="submit" class="submit-btn" id="submitBtn" disabled>
-                <i class="fas fa-calendar-check"></i>
-                <span>Забронировать</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Decorative images positioned between form and description -->
-      <div class="decorative-images">
-        <img src="{{ url_for('static', filename='images/parking-sign-1.png') }}" alt="Parking Sign" class="parking-sign">
-        <img src="{{ url_for('static', filename='images/calendar.png') }}" alt="Calendar" class="calendar-image">
-        <img src="{{ url_for('static', filename='images/plane.png') }}" alt="Plane" class="plane-image">
-      </div>
-    </div>
-  </div>
-
-  <!-- Bottom sections on the same level -->
-  <div class="bottom-sections">
-    <!-- Why us section -->
-    <section class="why-us-section">
-      <h2>Почему мы?</h2>
-      <div class="why-us-container">
-        <div class="advantages-grid">
-          <div class="advantage-item">
-            <i class="fas fa-check-circle"></i>
-            <span>Трансфер до аэропорта</span>
-          </div>
-          <div class="advantage-item">
-            <i class="fas fa-check-circle"></i>
-            <span>Бесплатно пуско-зарядное устройство</span>
-          </div>
-          <div class="advantage-item">
-            <i class="fas fa-check-circle"></i>
-            <span>Бесплатное взвешивание багажа</span>
-          </div>
-          <div class="advantage-item">
-            <i class="fas fa-check-circle"></i>
-            <span>Упаковка багажа</span>
-          </div>
-          <div class="advantage-item">
-            <i class="fas fa-check-circle"></i>
-            <span>Встреча по прилету</span>
-          </div>
-          <div class="advantage-item">
-            <i class="fas fa-check-circle"></i>
-            <span>Бесплатно компрессор для шин</span>
-          </div>
-        </div>
-        
-        <!-- Car image in why us section -->
-        <!-- <div class="car-image">
-          <img src="{{ url_for('static', filename='images/car-new.png') }}" alt="Car">
-        </div> -->
-      </div>
-    </section>
-
-    <!-- FAQ section -->
-    <section class="faq-section">
-      <h2>Вопрос - Ответ</h2>
-      <div class="faq-container">
-        <div class="faq-item">
-          <div class="faq-header">
-            <span>Порядок действий</span>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="faq-content">
-            <ol>
-              <li>Вы бронируете место.</li>
-              <li>Приезжаете на парковку.</li>
-              <li>Мы своим транспортом доставляем Вас до аэропорта. Время в пути от парковки до аэропорта 5 минут.</li>
-              <li>По прилете (после получения багажа) Вы звоните нам, пока Вы будете выходить мы приезжаем за Вами и отвозим на парковку.</li>
-            </ol>
-          </div>
-        </div>
-        
-        <div class="faq-item">
-          <div class="faq-header">
-            <span>Оплата</span>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="faq-content">
-            <p>По въезде на парковку вы получаете парковочную карту, которая фиксирует ваш автомобиль, дату и время заезда на парковку. Оплата парковки происходит при выезде с парковки.</p>
-          </div>
-        </div>
-        
-        <div class="faq-item">
-          <div class="faq-header">
-            <span>Прилетаешь в другой аэропорт?</span>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="faq-content">
-            <p>Бронировать такси в другие аэропорты желательно заранее</p>
-            <ul>
-              <li>аэр. Домодедово → аэр. Шереметьево — 2700 рублей</li>
-              <li>аэр. Внуково → аэр. Шереметьево — 2500 рублей</li>
-              <li>аэр. Внуково → аэр. Домодедово — 2500 рублей</li>
-            </ul>
-          </div>
-        </div>
-        
-        <div class="faq-item">
-          <div class="faq-header">
-            <span>Как добраться из терминала B в терминал (D) (В,C)?</span>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="faq-content">
-            <p>Терминалы B и C, составляющие Северный комплекс, расположены максимально близко друг к другу. Вы можете легко пройти пешком по переходу на 3 этаже. Также можно прогуляться по улице, любуясь видами аэропорта — терминалы находятся буквально в нескольких шагах друг от друга. 😊</p>
-          </div>
-        </div>
-        
-        <div class="faq-item">
-          <div class="faq-header">
-            <span>Место встречи и высадки?</span>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="faq-content">
-            <p>Место встречи и высадки закреплено за нами на выезде из терминалов B-C на постоянной основе.<br>
-            Дойти до места остановки трансфера из терминалов B-C можно за 3-5 мин.<br><br>
-            К сожалению, администрацией аэропорта официально запрещены въезд и остановка у терминалов B-C в зоне прилета для всех видов такси и автобусов, кроме городских и личных автомобилей. Надеемся на понимание!</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // FAQ accordion functionality
-    const faqHeaders = document.querySelectorAll('.faq-header');
-    faqHeaders.forEach(header => {
-        header.addEventListener('click', function() {
-            const faqItem = this.parentElement;
-            const content = faqItem.querySelector('.faq-content');
-            const icon = this.querySelector('i');
-            
-            // Toggle active state
-            faqItem.classList.toggle('active');
-            
-            // Toggle content visibility
-            if (faqItem.classList.contains('active')) {
-                content.style.maxHeight = content.scrollHeight + 'px';
-                icon.style.transform = 'rotate(180deg)';
-            } else {
-                content.style.maxHeight = '0';
-                icon.style.transform = 'rotate(0deg)';
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Парковка в Шереметьево - 5 минут до аэропорта</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+        <style>
+            body {
+                font-family: 'Inter', sans-serif;
             }
-        });
-    });
-    
-    // Auto-set end date to start date
-    const startDateInput = document.getElementById('start_date');
-    const endDateInput = document.getElementById('end_date');
-    if (startDateInput && endDateInput) {
-        startDateInput.addEventListener('change', function() {
-            endDateInput.value = startDateInput.value;
-        });
-    }
-});
-</script>
-{% endblock %}
+
+            .hero-bg {
+                background-image: url('https://images.unsplash.com/photo-1569154941061-e231b4725ef1?q=80&w=1920&auto=format&fit=crop');
+                background-size: cover;
+                background-position: center;
+            }
+
+            .scroll-smooth {
+                scroll-behavior: smooth;
+            }
+
+            html {
+                scroll-behavior: smooth;
+            }
+
+            .faq-question.active .faq-arrow {
+                transform: rotate(180deg);
+            }
+        </style>
+    </head>
+
+    <body class="bg-gray-50 overflow-x-hidden">
+
+        <!-- Шапка сайта -->
+        <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center py-4">
+                    <div class="text-2xl font-extrabold text-blue-800">
+                        <a href="#">UPARKING</a>
+                    </div>
+                    <nav class="hidden md:flex items-center space-x-6">
+                        <a href="#tariffs" class="text-gray-600 hover:text-blue-600 transition duration-300">Тарифы</a>
+                        <a href="#services" class="text-gray-600 hover:text-blue-600 transition duration-300">Услуги</a>
+                        <a href="#how-it-works" class="text-gray-600 hover:text-blue-600 transition duration-300">Как
+                            это работает</a>
+                        <a href="#contacts"
+                            class="text-gray-600 hover:text-blue-600 transition duration-300">Контакты</a>
+                    </nav>
+                    <div class="flex items-center space-x-4">
+                        <a href="tel:+79251112676"
+                            class="text-lg font-bold text-gray-800 hover:text-blue-600 transition duration-300">+7 (925)
+                            111-26-76</a>
+                        <button id="mobile-menu-button" class="md:hidden p-2 rounded-md hover:bg-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16m-7 6h7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Мобильное меню -->
+            <div id="mobile-menu" class="hidden md:hidden bg-white py-4">
+                <a href="#tariffs" class="block text-center py-2 px-4 text-gray-600 hover:bg-blue-50">Тарифы</a>
+                <a href="#services" class="block text-center py-2 px-4 text-gray-600 hover:bg-blue-50">Услуги</a>
+                <a href="#how-it-works" class="block text-center py-2 px-4 text-gray-600 hover:bg-blue-50">Как это
+                    работает</a>
+                <a href="#contacts" class="block text-center py-2 px-4 text-gray-600 hover:bg-blue-50">Контакты</a>
+            </div>
+        </header>
+
+        <!-- Главный экран -->
+        <main>
+            <section class="hero-bg text-white">
+                <div class="bg-black/50 min-h-[85vh] md:min-h-[70vh] flex items-center py-12">
+                    <div class="container mx-auto px-4 text-center">
+                        <h1 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">Парковка в Шереметьево</h1>
+                        <p class="text-lg md:text-2xl mb-8 max-w-3xl mx-auto">Всего 5 минут до терминалов B и C с
+                            бесплатным трансфером 24/7</p>
+
+                        <div
+                            class="bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto text-gray-800">
+                            <form id="booking-form" class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="last-name" class="block text-left font-medium mb-1">Фамилия</label>
+                                        <input type="text" id="last-name" name="last-name"
+                                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="Иванов" required>
+                                    </div>
+                                    <div>
+                                        <label for="first-name" class="block text-left font-medium mb-1">Имя</label>
+                                        <input type="text" id="first-name" name="first-name"
+                                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="Иван" required>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="phone" class="block text-left font-medium mb-1">Номер телефона</label>
+                                    <input type="tel" id="phone" name="phone"
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="+7 (999) 123-45-67" required>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="date-in" class="block text-left font-medium mb-1">Дата и время
+                                            въезда</label>
+                                        <input type="datetime-local" id="date-in" name="date-in"
+                                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            required>
+                                    </div>
+                                    <div>
+                                        <label for="date-out" class="block text-left font-medium mb-1">Дата и время
+                                            выезда</label>
+                                        <input type="datetime-local" id="date-out" name="date-out"
+                                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            required>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="minibus" name="minibus"
+                                            class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                        <label for="minibus" class="ml-2 block text-sm text-gray-700">
+                                            Микроавтобус (дополнительная плата 500 ₽/сутки)
+                                        </label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="privacy-policy" name="privacy-policy"
+                                            class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            required>
+                                        <label for="privacy-policy" class="ml-2 block text-sm text-gray-700">
+                                            Я согласен с <a href="#" class="text-blue-600 hover:underline">политикой
+                                                обработки
+                                                персональных данных</a>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-2">
+                                    <div class="text-center md:text-left">
+                                        <p class="text-lg font-medium">Стоимость:</p>
+                                        <p id="price-output" class="text-3xl font-bold text-blue-700">0 ₽</p>
+                                    </div>
+                                    <button type="submit"
+                                        class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold p-3 rounded-lg text-lg transition duration-300 shadow-lg hover:shadow-xl">
+                                        Забронировать
+                                    </button>
+                                </div>
+                            </form>
+                            <div id="form-message" class="mt-4 text-center font-medium"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Остальные секции сайта без изменений -->
+            <section id="tariffs" class="py-16">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Наши тарифы</h2>
+                    <div class="flex flex-wrap justify-center gap-8">
+                        <div
+                            class="w-full md:w-1/3 lg:w-1/4 bg-white p-8 rounded-2xl shadow-lg border-t-4 border-blue-500 transform hover:-translate-y-2 transition-transform duration-300">
+                            <h3 class="text-2xl font-bold text-center mb-4">Стандарт</h3>
+                            <p class="text-center text-5xl font-extrabold mb-4">300<span
+                                    class="text-2xl font-medium text-gray-500"> ₽/сутки</span></p>
+                            <ul class="text-gray-600 space-y-2 mb-6">
+                                <li class="flex items-center"><svg class="h-5 w-5 text-green-500 mr-2" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>От 3 до 25 суток</li>
+                                <li class="flex items-center"><svg class="h-5 w-5 text-green-500 mr-2" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>Минимальная оплата 900 ₽</li>
+                            </ul>
+                            <a href="#booking-form"
+                                class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">Забронировать</a>
+                        </div>
+                        <div
+                            class="w-full md:w-1/3 lg:w-1/4 bg-white p-8 rounded-2xl shadow-lg border-t-4 border-green-500 transform hover:-translate-y-2 transition-transform duration-300">
+                            <h3 class="text-2xl font-bold text-center mb-4">Долгосрок</h3>
+                            <p class="text-center text-5xl font-extrabold mb-4">150<span
+                                    class="text-2xl font-medium text-gray-500"> ₽/сутки</span></p>
+                            <ul class="text-gray-600 space-y-2 mb-6">
+                                <li class="flex items-center"><svg class="h-5 w-5 text-green-500 mr-2" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>При парковке от 26 суток</li>
+                                <li class="flex items-center"><svg class="h-5 w-5 text-green-500 mr-2" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>Экономия 50%</li>
+                            </ul>
+                            <a href="#booking-form"
+                                class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">Забронировать</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="how-it-works" class="py-16 bg-white">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Как это работает</h2>
+                    <div class="relative">
+                        <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-blue-200 -translate-y-1/2">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+                            <div class="text-center">
+                                <div class="relative mb-4">
+                                    <div
+                                        class="mx-auto w-20 h-20 flex items-center justify-center bg-blue-500 text-white rounded-full text-2xl font-bold border-4 border-white shadow-md">
+                                        1</div>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2">Бронируете место</h3>
+                                <p class="text-gray-600">На сайте или по телефону. Это быстро и бесплатно.</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="relative mb-4">
+                                    <div
+                                        class="mx-auto w-20 h-20 flex items-center justify-center bg-blue-500 text-white rounded-full text-2xl font-bold border-4 border-white shadow-md">
+                                        2</div>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2">Приезжаете</h3>
+                                <p class="text-gray-600">Оформляем договор и паркуем ваш автомобиль.</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="relative mb-4">
+                                    <div
+                                        class="mx-auto w-20 h-20 flex items-center justify-center bg-blue-500 text-white rounded-full text-2xl font-bold border-4 border-white shadow-md">
+                                        3</div>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2">Трансфер в аэропорт</h3>
+                                <p class="text-gray-600">Комфортно и быстро доставляем вас к терминалу.</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="relative mb-4">
+                                    <div
+                                        class="mx-auto w-20 h-20 flex items-center justify-center bg-blue-500 text-white rounded-full text-2xl font-bold border-4 border-white shadow-md">
+                                        4</div>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2">Встречаем вас</h3>
+                                <p class="text-gray-600">По прилету звоните нам, и мы забираем вас у терминала.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="services" class="py-16">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Наши услуги</h2>
+                    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2-2h8zM21 12h-4l-2-2m-2-2H5.5" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Бесплатный трансфер до аэропорта</h4>
+                                <p class="text-gray-600">Круглосуточная доставка пассажиров в аэропорт на
+                                    микроавтобусах.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Бесплатная встреча по прилету</h4>
+                                <p class="text-gray-600">Бесплатная встреча в аэропорту и бесплатный трансфер до
+                                    парковки.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Упаковка багажа</h4>
+                                <p class="text-gray-600">Качественно упакуем или переупакуем багаж.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l-6-2m6 2l-3 1m-3-1l-3-9m12 12l-3 1m0 0l-3-9m3 9l3-9M9 19l-3 1m0 0l-3-9m3 9l3-9" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Бесплатное взвешивание багажа</h4>
+                                <p class="text-gray-600">Бесплатно взвесим Ваш багаж, перепакуем в случае перевеса.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m0 18a9 9 0 009-9m-9 9a9 9 0 00-9-9" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Комната отдыха</h4>
+                                <p class="text-gray-600">Комната для клиентов с Wi-Fi.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Договор хранения</h4>
+                                <p class="text-gray-600">Мы гарантируем сохранность Вашего транспорта.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Бесплатно пуско-зарядное устройство</h4>
+                                <p class="text-gray-600">Зарядим аккумулятор, заведем Ваш автомобиль.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6V4m0 16v-2m8-8h2M4 12H2m15.364 6.364l1.414 1.414M4.222 4.222l1.414 1.414M19.778 4.222l-1.414 1.414M4.222 19.778l1.414-1.414M12 18a6 6 0 100-12 6 6 0 000 12z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Бесплатно компрессор для шин</h4>
+                                <p class="text-gray-600">При необходимости накачаем шины бесплатно.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Очистка территории парковки от снега</h4>
+                                <p class="text-gray-600">Очистим все подходы к автомобилю от снега к Вашему прилету.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Такси между аэропортами</h4>
+                                <p class="text-gray-600">Такси в любой аэропорт по низким ценам.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Круглосуточная охрана</h4>
+                                <p class="text-gray-600">Компетентная служба охраны парковки 24/7.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div
+                                class="flex-shrink-0 h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Система видеонаблюдения</h4>
+                                <p class="text-gray-600">Круглосуточная запись с камер.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="faq" class="py-16 bg-white">
+                <div class="container mx-auto px-4 max-w-4xl">
+                    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Часто задаваемые вопросы</h2>
+                    <div class="space-y-4">
+                        <div class="faq-item bg-gray-50 rounded-lg">
+                            <button
+                                class="faq-question w-full flex justify-between items-center text-left p-5 font-semibold text-lg"><span>Как
+                                    происходит оплата?</span><svg
+                                    class="faq-arrow h-6 w-6 transition-transform duration-300" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg></button>
+                            <div class="faq-answer hidden p-5 pt-0 text-gray-600">При въезде на парковку вы получаете
+                                парковочную карту, на которой автоматически фиксируются данные автомобиля, а также дата
+                                и время въезда. Оплата производится при выезде.
+                            </div>
+                        </div>
+                        <div class="faq-item bg-gray-50 rounded-lg">
+                            <button
+                                class="faq-question w-full flex justify-between items-center text-left p-5 font-semibold text-lg"><span>Как
+                                    меня встретят по прилету?</span><svg
+                                    class="faq-arrow h-6 w-6 transition-transform duration-300" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg></button>
+                            <div class="faq-answer hidden p-5 pt-0 text-gray-600">Место встречи и высадки закреплено за
+                                нами на выезде из терминалов B-C на постоянной основе.
+                                Дойти до места остановки трансфера из терминалов B-C можно за 3-5 мин.<br />
+
+                                К сожалению, администрацией аэропорта официально запрещены въезд и остановка у
+                                терминалов B-C в зоне прилета для всех видов такси и автобусов, кроме городских и личных
+                                автомобилей. Надеемся на понимание!</div>
+                        </div>
+                        <div class="faq-item bg-gray-50 rounded-lg">
+                            <button
+                                class="faq-question w-full flex justify-between items-center text-left p-5 font-semibold text-lg"><span>Если прилетаю в другой аэропорт?</span><svg
+                                    class="faq-arrow h-6 w-6 transition-transform duration-300" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg></button>
+                            <div class="faq-answer hidden p-5 pt-0 text-gray-600">Бронировать такси в другие аэропорты желательно заранее:<br />
+                                аэр. Домодедово → аэр. Шереметьево — 2700 рублей<br />
+                                аэр. Внуково → аэр. Шереметьево — 2500 рублей<br/>
+                                аэр. Внуково → аэр. Домодедово — 2500 рублей</div>
+                        </div>
+                        <div class="faq-item bg-gray-50 rounded-lg">
+                            <button
+                                class="faq-question w-full flex justify-between items-center text-left p-5 font-semibold text-lg"><span>Как добраться из терминала B в терминал (D) (В,C)?</span><svg
+                                    class="faq-arrow h-6 w-6 transition-transform duration-300" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg></button>
+                            <div class="faq-answer hidden p-5 pt-0 text-gray-600">Терминалы B и C, составляющие Северный комплекс, расположены максимально близко друг к другу. Вы можете легко пройти пешком по переходу на 3 этаже. Также можно прогуляться по улице, любуясь видами аэропорта — терминалы находятся буквально в нескольких шагах друг от друга.</div>
+                        </div>
+                        <div class="faq-item bg-gray-50 rounded-lg">
+                            <button
+                                class="faq-question w-full flex justify-between items-center text-left p-5 font-semibold text-lg"><span>Вы
+                                    заключаете договор?</span><svg
+                                    class="faq-arrow h-6 w-6 transition-transform duration-300" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg></button>
+                            <div class="faq-answer hidden p-5 pt-0 text-gray-600">Да, мы обязательно заключаем
+                                официальный договор ответственного хранения транспортного средства. Это гарантирует вашу
+                                юридическую защищенность.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="contacts" class="py-16">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Контакты и схема проезда</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div><iframe
+                                src="https://yandex.ru/map-widget/v1/?um=constructor%3Acc711b51169b5f0b336e3d70880d8f6d41bddf9e5f469e360563aaf5d9360ed3&amp;source=constructor"
+                                width="532" height="402" frameborder="0"></iframe></div>
+                        <div class="space-y-4">
+                            <p class="text-lg"><span class="font-bold">Адрес:</span> Московская область, Химки, Международное шоссе 28с18</p>
+                            <p class="text-lg"><span class="font-bold">Телефон:</span> <a href="tel:+74951473713"
+                                    class="text-blue-600 hover:underline">+7 (925) 111-26-76</a></p>
+                            <p class="text-lg"><span class="font-bold">Режим работы:</span> Круглосуточно, 24/7</p>
+                            <!-- <div class="flex space-x-4 mt-4">
+                                <a href="https://wa.me/74951473713" target="_blank"
+                                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center space-x-2"><svg
+                                        xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24"
+                                        fill="currentColor">
+                                        <path
+                                            d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99 0-3.903-.52-5.586-1.456l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.803 6.12l-1.34 4.887 4.963-1.303z" />
+                                    </svg><span>WhatsApp</span></a>
+                                <a href="https://t.me/" target="_blank"
+                                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center space-x-2"><svg
+                                        xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24"
+                                        fill="currentColor">
+                                        <path
+                                            d="M9.78 18.65l.28-4.23c.07-1.03-.46-1.4-1.1-1.19l-3.23.93c-.64.19-.97-.24-.58-.8l10.8-10.44c.4-.38 1.05-.14 1.32.35l3.59 15.77c.24 1.05-.48 1.4-1.28.94l-5.63-3.9z" />
+                                    </svg><span>Telegram</span></a>
+                            </div> -->
+                            <a href="https://yandex.ru/maps/org/sky_parking/121910080230/?ll=37.446187%2C55.970231&z=14"
+                                target="_blank"
+                                class="mt-6 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-4 px-8 rounded-lg transition duration-300 text-lg shadow-lg">Построить
+                                маршрут в Навигаторе</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Подвал -->
+        <footer class="bg-gray-800 text-white">
+            <div class="container mx-auto px-4 py-8 text-center">
+                <p>&copy; 2025 UPARKING. Все права защищены.</p>
+                <p>Данный сайт носит информационно-справочный характер и ни при каких условиях не является публичной офертой</p>
+            </div>
+        </footer>
+
+        <!-- Логика для работы с localStorage -->
+        <script>
+            // --- Логика для мобильного меню ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // --- Логика для калькулятора и формы ---
+            const bookingForm = document.getElementById('booking-form');
+            const dateInInput = document.getElementById('date-in');
+            const dateOutInput = document.getElementById('date-out');
+            const priceOutput = document.getElementById('price-output');
+            const formMessage = document.getElementById('form-message');
+            const lastNameInput = document.getElementById('last-name');
+            const firstNameInput = document.getElementById('first-name');
+            const phoneInput = document.getElementById('phone');
+            const minibusCheckbox = document.getElementById('minibus');
+
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            const minDate = now.toISOString().slice(0, 16);
+            dateInInput.min = minDate;
+            dateOutInput.min = minDate;
+
+            let calculatedPrice = 0;
+
+            function calculatePrice() {
+                const dateIn = new Date(dateInInput.value);
+                const dateOut = new Date(dateOutInput.value);
+
+                if (isNaN(dateIn) || isNaN(dateOut) || dateOut <= dateIn) {
+                    priceOutput.textContent = '0 ₽';
+                    calculatedPrice = 0;
+                    return;
+                }
+
+                const diffTime = Math.abs(dateOut - dateIn);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                const TARIFF_STANDARD = 300;
+                const TARIFF_LONG_TERM = 150;
+                const MINIMUM_PRICE = 900;
+                const MINIMUM_DAYS_FOR_MIN_PRICE = 2;
+                const MINIBUS_EXTRA = 500; // Дополнительная плата за микроавтобус
+
+                let totalPrice;
+                if (diffDays >= 26) {
+                    totalPrice = diffDays * TARIFF_LONG_TERM;
+                } else {
+                    totalPrice = diffDays * TARIFF_STANDARD;
+                }
+
+                if (diffDays <= MINIMUM_DAYS_FOR_MIN_PRICE && totalPrice < MINIMUM_PRICE) {
+                    totalPrice = MINIMUM_PRICE;
+                }
+
+                // Добавляем стоимость за микроавтобус, если выбран
+                if (minibusCheckbox.checked) {
+                    totalPrice += diffDays * MINIBUS_EXTRA;
+                }
+
+                calculatedPrice = totalPrice;
+                priceOutput.textContent = `${totalPrice.toLocaleString('ru-RU')} ₽`;
+            }
+
+            dateInInput.addEventListener('change', calculatePrice);
+            dateOutInput.addEventListener('change', calculatePrice);
+            minibusCheckbox.addEventListener('change', calculatePrice);
+
+            const startDate = new Date();
+            startDate.setHours(startDate.getHours() + 2);
+            const endDate = new Date();
+            endDate.setDate(startDate.getDate() + 5);
+
+            dateInInput.value = startDate.toISOString().slice(0, 16);
+            dateOutInput.value = endDate.toISOString().slice(0, 16);
+            calculatePrice();
+
+            // Маска для номера телефона
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                
+                // Если пользователь вводит номер, начинающийся с 8 или 9, заменяем на 7
+                if (value.length > 0 && value[0] === '8') {
+                    value = '7' + value.slice(1);
+                }
+                if (value.length > 0 && value[0] === '9') {
+                    value = '7' + value.slice(1);
+                }
+                
+                // Если номер начинается не с 7, добавляем 7 в начало
+                if (value.length > 0 && value[0] !== '7') {
+                    value = '7' + value;
+                }
+                
+                if (value.length > 0) {
+                    if (value.length <= 3) {
+                        value = '+7 (' + value.slice(1);
+                    } else if (value.length <= 6) {
+                        value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4);
+                    } else if (value.length <= 8) {
+                        value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7) + '-' + value.slice(7);
+                    } else {
+                        value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7) + '-' + value.slice(7, 9) + '-' + value.slice(9, 11);
+                    }
+                }
+                e.target.value = value;
+            });
+
+            // ОБНОВЛЕННАЯ ЛОГИКА ОТПРАВКИ ФОРМЫ С LOCALSTORAGE
+            bookingForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Отправка...';
+
+                try {
+
+                    // Собираем данные из формы
+                    const newBooking = {
+                        id: crypto.randomUUID(), // Уникальный ID для каждой заявки
+                        lastName: lastNameInput.value,
+                        firstName: firstNameInput.value,
+                        phone: phoneInput.value,
+                        dateIn: dateInInput.value,
+                        dateOut: dateOutInput.value,
+                        minibus: minibusCheckbox.checked,
+                        totalPrice: calculatedPrice,
+                        status: 'Новая',
+                        createdAt: new Date().toISOString()
+                    };
+
+
+                    formMessage.textContent = 'Спасибо за бронирование! Ваша заявка принята.';
+                    formMessage.className = 'mt-4 text-center font-medium text-green-600';
+                    bookingForm.reset();
+                    calculatePrice();
+
+                } catch (error) {
+                    console.error(error);
+                    formMessage.textContent = 'Произошла ошибка при отправке. Попробуйте еще раз.';
+                    formMessage.className = 'mt-4 text-center font-medium text-red-600';
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Забронировать';
+                    setTimeout(() => {
+                        formMessage.textContent = '';
+                    }, 5000);
+                }
+            });
+
+            // --- Логика для FAQ-аккордеона ---
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                const answer = item.querySelector('.faq-answer');
+                question.addEventListener('click', () => {
+                    const isActive = question.classList.contains('active');
+                    document.querySelectorAll('.faq-question').forEach(q => q.classList.remove('active'));
+                    document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
+                    if (!isActive) {
+                        question.classList.add('active');
+                        answer.style.display = 'block';
+                    }
+                });
+            });
+
+        </script>
+
+    </body>
+
+</html>

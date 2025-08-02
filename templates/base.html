@@ -14,7 +14,10 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body{% if settings and settings.hourly_price is not none %} data-hourly-price="{{ settings.hourly_price }}"{% endif %}>
+<body{% if settings and settings.hourly_price is not none %} data-hourly-price="{{ settings.hourly_price }}"{% endif %}
+      data-daily-price-1-25="{{ settings.daily_price_1_25 if settings and settings.daily_price_1_25 else 300 }}"
+      data-daily-price-26-plus="{{ settings.daily_price_26_plus if settings and settings.daily_price_26_plus else 150 }}"
+      data-minibus-price="{{ settings.minibus_price if settings and settings.minibus_price else 500 }}">
     <div class="container">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
