@@ -797,13 +797,13 @@
             dateOutInput.addEventListener('change', calculatePrice);
             minibusCheckbox.addEventListener('change', calculatePrice);
 
-            const startDate = new Date();
-            startDate.setHours(startDate.getHours() + 2);
-            const endDate = new Date();
-            endDate.setDate(startDate.getDate() + 5);
+            // const startDate = new Date();
+            // startDate.setHours(startDate.getHours() + 2);
+            // const endDate = new Date();
+            // endDate.setDate(startDate.getDate() + 5);
 
-            dateInInput.value = startDate.toISOString().slice(0, 16);
-            dateOutInput.value = endDate.toISOString().slice(0, 16);
+            // dateInInput.value = startDate.toISOString().slice(0, 16);
+            // dateOutInput.value = endDate.toISOString().slice(0, 16);
             calculatePrice();
 
             // Маска для номера телефона
