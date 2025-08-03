@@ -82,6 +82,34 @@
                 .mobile-nav a:last-child {
                     border-bottom: none;
                 }
+
+                /* Стили для галереи, чтобы скрыть скроллбар */
+                .gallery-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .gallery-scrollbar {
+                    -ms-overflow-style: none;
+                    /* IE and Edge */
+                    scrollbar-width: none;
+                    /* Firefox */
+                }
+
+                @media (min-width: 768px) {
+                    .mobile-form {
+                        padding: 1.5rem;
+                    }
+
+                    .mobile-touch-target {
+                        padding: 1rem;
+                    }
+                }
+
+                @media (min-width: 1024px) {
+                    .mobile-form {
+                        padding: 2rem;
+                    }
+                }
             }
         </style>
     </head>
@@ -315,32 +343,32 @@
                     <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 px-4">Фотогалерея</h2>
                     <div class="flex overflow-x-auto snap-x snap-mandatory space-x-4 px-4 gallery-scrollbar">
                         <div class="snap-center flex-shrink-0 w-full md:w-1/3 rounded-lg overflow-hidden">
-                            <img src="/static/images/gallery/photo1.jpg"
-                                alt="Фото крытой парковки" class="w-full h-full object-cover">
+                            <img src="/static/images/gallery/photo1.jpg" alt="Фото крытой парковки"
+                                class="w-full h-full object-contain">
                         </div>
                         <div class="snap-center flex-shrink-0 w-full md:w-1/3 rounded-lg overflow-hidden">
-                            <img src="/static/images/gallery/photo2.jpg"
-                                alt="Трансферный автобус" class="w-full h-full object-cover">
+                            <img src="/static/images/gallery/photo2.jpg" alt="Трансферный автобус"
+                                class="w-full h-full object-contain">
                         </div>
                         <div class="snap-center flex-shrink-0 w-full md:w-1/3 rounded-lg overflow-hidden">
-                            <img src="/static/images/gallery/photo3.jpg"
-                                alt="Зона ожидания для клиентов" class="w-full h-full object-cover">
+                            <img src="/static/images/gallery/photo3.jpg" alt="Зона ожидания для клиентов"
+                                class="w-full h-full object-contain">
                         </div>
                         <div class="snap-center flex-shrink-0 w-full md:w-1/3 rounded-lg overflow-hidden">
-                            <img src="/static/images/gallery/photo4.jpg"
-                                alt="Система видеонаблюдения" class="w-full h-full object-cover">
+                            <img src="/static/images/gallery/photo4.jpg" alt="Система видеонаблюдения"
+                                class="w-full h-full object-contain">
                         </div>
                         <div class="snap-center flex-shrink-0 w-full md:w-1/3 rounded-lg overflow-hidden">
-                            <img src="/static/images/gallery/photo5.jpg"
-                                alt="Услуга упаковки багажа" class="w-full h-full object-cover">
+                            <img src="/static/images/gallery/photo5.jpg" alt="Услуга упаковки багажа"
+                                class="w-full h-full object-contain">
                         </div>
                         <div class="snap-center flex-shrink-0 w-full md:w-1/3 rounded-lg overflow-hidden">
-                            <img src="/static/images/gallery/photo6.jpg"
-                                alt="Услуга упаковки багажа" class="w-full h-full object-cover">
+                            <img src="/static/images/gallery/photo6.jpg" alt="Услуга упаковки багажа"
+                                class="w-full h-full object-contain">
                         </div>
                         <div class="snap-center flex-shrink-0 w-full md:w-1/3 rounded-lg overflow-hidden">
-                            <img src="/static/images/gallery/photo7.jpg"
-                                alt="Услуга упаковки багажа" class="w-full h-full object-cover">
+                            <img src="/static/images/gallery/photo7.jpg" alt="Услуга упаковки багажа"
+                                class="w-full h-full object-contain">
                         </div>
                     </div>
                 </div>
