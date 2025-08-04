@@ -843,23 +843,28 @@
         let calculatedPrice = 0;
 
         function calculatePrice() {
-            const dateIn = new Date(dateInInput.value);
-            const dateOut = new Date(dateOutInput.value);
+             // --- Новый, более точный алгоритм расчета дней ---
+            const start = new Date(dateIn);
+            start.setHours(0, 0, 0, 0);
 
-            if (isNaN(dateIn) || isNaN(dateOut) || dateOut <= dateIn) {
-                priceOutput.textContent = '0 ₽';
-                calculatedPrice = 0;
-                return;
+            const end = new Date(dateOut);
+            
+            if (end.getHours() === 0 && end.getMinutes() === 0 && end.getSeconds() === 0 && end.getMilliseconds() === 0) {
+                 if (end.getTime() > start.getTime()) {
+                    end.setTime(end.getTime() - 1);
+                 }
             }
+            end.setHours(0, 0, 0, 0);
 
-            const diffTime = Math.abs(dateOut - dateIn);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const diffTime = end.getTime() - start.getTime();
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            // --- Конец нового алгоритма ---
 
             const TARIFF_STANDARD = 350;
             const TARIFF_LONG_TERM = 150;
             const MINIMUM_PRICE = 900;
             const MINIMUM_DAYS_FOR_MIN_PRICE = 2;
-            const MINIBUS_EXTRA = 500; // Дополнительная плата за микроавтобус
+            const MINIBUS_EXTRA = 350; // Дополнительная плата за микроавтобус
 
             let totalPrice;
             if (diffDays >= 26) {
