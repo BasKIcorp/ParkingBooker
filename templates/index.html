@@ -795,7 +795,7 @@
                                             d="M9.78 18.65l.28-4.23c.07-1.03-.46-1.4-1.1-1.19l-3.23.93c-.64.19-.97-.24-.58-.8l10.8-10.44c.4-.38 1.05-.14 1.32.35l3.59 15.77c.24 1.05-.48 1.4-1.28.94l-5.63-3.9z" />
                                     </svg><span>Telegram</span></a>
                             </div> -->
-                        <a href="https://yandex.ru/maps/org/sky_parking/121910080230/?ll=37.446449%2C55.970333&z=14"
+                        <a href="https://yandex.ru/maps/org/shinomontazh/229305836713/?ll=37.448074%2C55.963133&z=15"
                             target="_blank"
                             class="mt-6 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-3 md:py-4 px-6 md:px-8 rounded-lg transition duration-300 text-base md:text-lg shadow-lg mobile-touch-target">Построить
                             маршрут в Навигаторе</a>
@@ -843,7 +843,16 @@
         let calculatedPrice = 0;
 
         function calculatePrice() {
-             // --- Новый, более точный алгоритм расчета дней ---
+            const dateIn = new Date(dateInInput.value);
+            const dateOut = new Date(dateOutInput.value);
+
+            if (isNaN(dateIn) || isNaN(dateOut) || dateOut <= dateIn) {
+                priceOutput.textContent = '0 ₽';
+                calculatedPrice = 0;
+                return;
+            }
+
+            // --- Новый, более точный алгоритм расчета дней ---
             const start = new Date(dateIn);
             start.setHours(0, 0, 0, 0);
 
@@ -860,11 +869,11 @@
             const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
             // --- Конец нового алгоритма ---
 
-            const TARIFF_STANDARD = 350;
+            const TARIFF_STANDARD = 300;
             const TARIFF_LONG_TERM = 150;
             const MINIMUM_PRICE = 900;
-            const MINIMUM_DAYS_FOR_MIN_PRICE = 2;
-            const MINIBUS_EXTRA = 350; // Дополнительная плата за микроавтобус
+            const MINIBUS_SURCHARGE = 350;
+            const MINIMUM_DAYS_FOR_MIN_PRICE = 1;
 
             let totalPrice;
             if (diffDays >= 26) {
@@ -872,14 +881,13 @@
             } else {
                 totalPrice = diffDays * TARIFF_STANDARD;
             }
-
+            
             if (diffDays <= MINIMUM_DAYS_FOR_MIN_PRICE && totalPrice < MINIMUM_PRICE) {
-                totalPrice = MINIMUM_PRICE;
+                 totalPrice = MINIMUM_PRICE;
             }
-
-            // Добавляем стоимость за микроавтобус, если выбран
+            
             if (minibusCheckbox.checked) {
-                totalPrice += diffDays * MINIBUS_EXTRA;
+                totalPrice += diffDays * MINIBUS_SURCHARGE;
             }
 
             calculatedPrice = totalPrice;
