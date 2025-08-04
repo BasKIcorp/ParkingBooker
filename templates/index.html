@@ -312,7 +312,14 @@
                                     <input type="checkbox" id="minibus" name="minibus"
                                         class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                                     <label for="minibus" class="ml-2 block text-sm text-gray-700">
-                                        Микроавтобус (дополнительная плата 350 ₽/сутки)
+                                        Микроавтобус (доп. плата 350 ₽/сутки)
+                                    </label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="minibus-heavy" name="minibus-heavy"
+                                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                    <label for="minibus-heavy" class="ml-2 block text-sm text-gray-700">
+                                        Микроавтобус (грузовой, доп. плата 700 ₽/сутки)
                                     </label>
                                 </div>
                             </div>
@@ -833,6 +840,7 @@
         const firstNameInput = document.getElementById('first-name');
         const phoneInput = document.getElementById('phone');
         const minibusCheckbox = document.getElementById('minibus');
+        const minibusHeavyCheckbox = document.getElementById('minibus-heavy');
 
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -857,11 +865,11 @@
             start.setHours(0, 0, 0, 0);
 
             const end = new Date(dateOut);
-            
+
             if (end.getHours() === 0 && end.getMinutes() === 0 && end.getSeconds() === 0 && end.getMilliseconds() === 0) {
-                 if (end.getTime() > start.getTime()) {
+                if (end.getTime() > start.getTime()) {
                     end.setTime(end.getTime() - 1);
-                 }
+                }
             }
             end.setHours(0, 0, 0, 0);
 
@@ -872,6 +880,7 @@
             const TARIFF_STANDARD = 300;
             const TARIFF_LONG_TERM = 150;
             const MINIMUM_PRICE = 900;
+            const MINIBUS_HEAVY_SURCHARGE = 750;
             const MINIBUS_SURCHARGE = 350;
             const MINIMUM_DAYS_FOR_MIN_PRICE = 2;
 
@@ -881,13 +890,16 @@
             } else {
                 totalPrice = diffDays * TARIFF_STANDARD;
             }
-            
+
             if (diffDays <= MINIMUM_DAYS_FOR_MIN_PRICE && totalPrice < MINIMUM_PRICE) {
-                 totalPrice = MINIMUM_PRICE;
+                totalPrice = MINIMUM_PRICE;
             }
-            
+
             if (minibusCheckbox.checked) {
                 totalPrice += diffDays * MINIBUS_SURCHARGE;
+            }
+            if (minibusHeavyCheckbox.checked) {
+                totalPrice += diffDays * MINIBUS_HEAVY_SURCHARGE;
             }
 
             calculatedPrice = totalPrice;
