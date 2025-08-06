@@ -61,7 +61,6 @@ def main():
     
     print("\n" + "="*50)
     
-    # Проверка импортов
     imports_ok = check_imports()
     
     print("\n" + "="*50)

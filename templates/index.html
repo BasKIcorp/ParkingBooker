@@ -32,7 +32,6 @@
             transform: rotate(180deg);
         }
 
-        /* Мобильные стили */
         @media (max-width: 768px) {
             .hero-bg {
                 background-image: url('https://images.unsplash.com/photo-1569154941061-e231b4725ef1?q=80&w=800&auto=format&fit=crop');
@@ -46,30 +45,25 @@
                 display: none !important;
             }
 
-            /* Улучшенные отступы для мобильных */
             .container {
                 padding-left: 1rem;
                 padding-right: 1rem;
             }
 
-            /* Увеличенные кнопки для мобильных */
             .mobile-touch-target {
                 min-height: 44px;
                 min-width: 44px;
             }
 
-            /* Улучшенная форма для мобильных */
             .mobile-form {
                 padding: 1rem;
                 margin: 0 0.5rem;
             }
 
-            /* Адаптивные карточки */
             .mobile-card {
                 margin-bottom: 1rem;
             }
 
-            /* Улучшенная навигация */
             .mobile-nav {
                 padding: 0.5rem 0;
             }
@@ -83,16 +77,13 @@
                 border-bottom: none;
             }
 
-            /* Стили для галереи, чтобы скрыть скроллбар */
             .gallery-scrollbar::-webkit-scrollbar {
                 display: none;
             }
 
             .gallery-scrollbar {
-                -ms-overflow-style: none;
-                /* IE and Edge */
+                -ms-overflow-style: none;                
                 scrollbar-width: none;
-                /* Firefox */
             }
 
 
@@ -118,7 +109,7 @@
 
 <body class="bg-gray-50 overflow-x-hidden">
 
-    <!-- Шапка сайта -->
+    
     <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
@@ -154,7 +145,7 @@
                 </div>
             </div>
         </div>
-        <!-- Мобильное меню -->
+        
         <div id="mobile-menu" class="hidden md:hidden bg-white py-4 mobile-nav">
             <a href="#tariffs"
                 class="block text-center py-3 px-4 text-gray-600 hover:bg-blue-50 mobile-touch-target">Тарифы</a>
@@ -168,7 +159,6 @@
         </div>
     </header>
 
-    <!-- Главный экран -->
     <main>
         <section class="hero-bg text-white">
             <div class="bg-black/50 min-h-[85vh] md:min-h-[70vh] flex items-center py-8 md:py-12">
@@ -178,7 +168,6 @@
                     <p class="text-base sm:text-lg md:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto px-2">Всего 5 минут до
                         терминалов B и C с
                         бесплатным трансфером 24/7</p>
-                    <!-- Добавлен блок с ценой -->
                     <div
                         class="inline-block bg-yellow-400 text-gray-900 font-bold px-6 py-2 rounded-full mb-8 text-lg shadow-lg">
                         Парковка от 150 рублей
@@ -187,79 +176,6 @@
                         class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-lg text-lg transition duration-300 shadow-lg hover:shadow-xl">
                         Перейти к бронированию
                     </a>
-                    <!-- <div
-                            class="bg-white/90 backdrop-blur-sm p-4 md:p-6 lg:p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto text-gray-800 mobile-form">
-                            <form id="booking-form" class="space-y-4">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="last-name" class="block text-left font-medium mb-1">Фамилия</label>
-                                        <input type="text" id="last-name" name="last-name"
-                                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            placeholder="Иванов" required>
-                                    </div>
-                                    <div>
-                                        <label for="first-name" class="block text-left font-medium mb-1">Имя</label>
-                                        <input type="text" id="first-name" name="first-name"
-                                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            placeholder="Иван" required>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label for="phone" class="block text-left font-medium mb-1">Номер телефона</label>
-                                    <input type="tel" id="phone" name="phone"
-                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="+7 (999) 123-45-67" required>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="date-in" class="block text-left font-medium mb-1">Дата и время
-                                            въезда</label>
-                                        <input type="datetime-local" id="date-in" name="date-in"
-                                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            required>
-                                    </div>
-                                    <div>
-                                        <label for="date-out" class="block text-left font-medium mb-1">Дата и время
-                                            выезда</label>
-                                        <input type="datetime-local" id="date-out" name="date-out"
-                                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            required>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex items-center">
-                                        <input type="checkbox" id="minibus" name="minibus"
-                                            class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                        <label for="minibus" class="ml-2 block text-sm text-gray-700">
-                                            Микроавтобус (дополнительная плата 500 ₽/сутки)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex items-center">
-                                        <input type="checkbox" id="privacy-policy" name="privacy-policy"
-                                            class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                            required>
-                                        <label for="privacy-policy" class="ml-2 block text-sm text-gray-700">
-                                            Я согласен с <a href="#" class="text-blue-600 hover:underline">политикой
-                                                обработки
-                                                персональных данных</a>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-2">
-                                    <div class="text-center md:text-left">
-                                        <p class="text-base md:text-lg font-medium">Стоимость:</p>
-                                        <p id="price-output" class="text-2xl md:text-3xl font-bold text-blue-700">0 ₽</p>
-                                    </div>
-                                    <button type="submit"
-                                        class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold p-3 md:p-4 rounded-lg text-base md:text-lg transition duration-300 shadow-lg hover:shadow-xl mobile-touch-target">
-                                        Забронировать
-                                    </button>
-                                </div>
-                            </form>
-                            <div id="form-message" class="mt-4 text-center font-medium"></div>
-                        </div> -->
                 </div>
             </div>
         </section>
@@ -267,7 +183,6 @@
             <div class="container mx-auto px-4">
                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Онлайн-бронирование</h2>
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-xl max-w-4xl mx-auto border border-gray-200">
-                    <!-- Новая форма бронирования -->
                     <div
                         class="bg-white/90 backdrop-blur-sm p-4 md:p-6 lg:p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto text-gray-800 mobile-form">
                         <form id="booking-form" class="space-y-4">
@@ -386,7 +301,7 @@
                                 class="w-full h-full object-contain">
                         </div>
                     </div>
-                    <!-- Кнопки навигации -->
+                    <!-- Кнопки навигации в галерее -->
                     <button id="scroll-left"
                         class="absolute top-1/2 left-2 md:left-4 transform -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-2 transition duration-300 z-10">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none"
@@ -786,22 +701,6 @@
                         </p>
                         <p class="text-base md:text-lg"><span class="font-bold">Режим работы:</span> Круглосуточно,
                             24/7</p>
-                        <!-- <div class="flex space-x-4 mt-4">
-                                <a href="https://wa.me/74951473713" target="_blank"
-                                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center space-x-2"><svg
-                                        xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24"
-                                        fill="currentColor">
-                                        <path
-                                            d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99 0-3.903-.52-5.586-1.456l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.803 6.12l-1.34 4.887 4.963-1.303z" />
-                                    </svg><span>WhatsApp</span></a>
-                                <a href="https://t.me/" target="_blank"
-                                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center space-x-2"><svg
-                                        xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24"
-                                        fill="currentColor">
-                                        <path
-                                            d="M9.78 18.65l.28-4.23c.07-1.03-.46-1.4-1.1-1.19l-3.23.93c-.64.19-.97-.24-.58-.8l10.8-10.44c.4-.38 1.05-.14 1.32.35l3.59 15.77c.24 1.05-.48 1.4-1.28.94l-5.63-3.9z" />
-                                    </svg><span>Telegram</span></a>
-                            </div> -->
                         <a href="https://yandex.ru/maps/org/shinomontazh/229305836713/?ll=37.448074%2C55.963133&z=15"
                             target="_blank"
                             class="mt-6 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-3 md:py-4 px-6 md:px-8 rounded-lg transition duration-300 text-base md:text-lg shadow-lg mobile-touch-target">Построить
@@ -812,7 +711,6 @@
         </section>
     </main>
 
-    <!-- Подвал -->
     <footer class="bg-gray-800 text-white">
         <div class="container mx-auto px-4 py-6 md:py-8 text-center">
             <p class="text-sm md:text-base">&copy; 2025 UPARKING. Все права защищены.</p>
@@ -821,16 +719,15 @@
         </div>
     </footer>
 
-    <!-- Логика для работы с localStorage -->
     <script>
-        // --- Логика для мобильного меню ---
+        //Мобильное меню
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
 
-        // --- Логика для калькулятора и формы ---
+        // Форма бронирования
         const bookingForm = document.getElementById('booking-form');
         const dateInInput = document.getElementById('date-in');
         const dateOutInput = document.getElementById('date-out');
@@ -860,7 +757,6 @@
                 return;
             }
 
-            // --- Новый, более точный алгоритм расчета дней ---
             const start = new Date(dateIn);
             start.setHours(0, 0, 0, 0);
 
@@ -875,7 +771,6 @@
 
             const diffTime = end.getTime() - start.getTime();
             const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
-            // --- Конец нового алгоритма ---
 
             const TARIFF_STANDARD = 350;
             const TARIFF_LONG_TERM = 150;
@@ -910,20 +805,13 @@
         dateOutInput.addEventListener('change', calculatePrice);
         minibusCheckbox.addEventListener('change', calculatePrice);
         minibusHeavyCheckbox.addEventListener('change', calculatePrice);
-        // const startDate = new Date();
-        // startDate.setHours(startDate.getHours() + 2);
-        // const endDate = new Date();
-        // endDate.setDate(startDate.getDate() + 5);
-
-        // dateInInput.value = startDate.toISOString().slice(0, 16);
-        // dateOutInput.value = endDate.toISOString().slice(0, 16);
+        
         calculatePrice();
 
         // Маска для номера телефона
         phoneInput.addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, '');
 
-            // Если пользователь вводит номер, начинающийся с 8 или 9, заменяем на 7
             if (value.length > 0 && value[0] === '8') {
                 value = '7' + value.slice(1);
             }
@@ -931,7 +819,6 @@
                 value = '7' + value.slice(1);
             }
 
-            // Если номер начинается не с 7, добавляем 7 в начало
             if (value.length > 0 && value[0] !== '7') {
                 value = '7' + value;
             }
@@ -950,7 +837,6 @@
             e.target.value = value;
         });
 
-        // ОБНОВЛЕННАЯ ЛОГИКА ОТПРАВКИ ФОРМЫ С LOCALSTORAGE
         bookingForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
@@ -960,9 +846,8 @@
 
             try {
 
-                // Собираем данные из формы
                 const newBooking = {
-                    id: crypto.randomUUID(), // Уникальный ID для каждой заявки
+                    id: crypto.randomUUID(),
                     lastName: lastNameInput.value,
                     firstName: firstNameInput.value,
                     phone: phoneInput.value,
@@ -993,7 +878,7 @@
             }
         });
 
-        // --- Логика для FAQ-аккордеона ---
+        //FAQ-аккордеон
         const faqItems = document.querySelectorAll('.faq-item');
         faqItems.forEach(item => {
             const question = item.querySelector('.faq-question');
@@ -1009,7 +894,7 @@
             });
         });
 
-        // --- Логика для галереи ---
+        //галерея
         const galleryContainer = document.getElementById('gallery-container');
         const scrollLeftBtn = document.getElementById('scroll-left');
         const scrollRightBtn = document.getElementById('scroll-right');

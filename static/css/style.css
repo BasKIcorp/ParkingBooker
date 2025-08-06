@@ -1,4 +1,3 @@
-/* Reset and base styles */
 * {
     margin: 0;
     padding: 0;
@@ -13,7 +12,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Container */
 .container {
     max-width: 1440px;
     margin: 0 auto;
@@ -21,7 +19,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Main container */
 .main-container {
     max-width: 1440px;
     margin: 0 auto;
@@ -30,7 +27,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Header styles */
 .main-header {
     background: #FFFFFF;
     box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.15);
@@ -130,13 +126,13 @@ body {
     text-align: right;
 }
 
-/* Main content section */
+
 .main-content {
     padding: 40px 120px;
     position: relative;
 }
 
-/* Hero section */
+
 .hero-section {
     background: #FFFFFF;
     box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.15);
@@ -154,7 +150,7 @@ body {
     z-index: 2;
 }
 
-/* Security content (left side) */
+
 .security-content {
     flex: 1;
     max-width: 559px;
@@ -221,7 +217,7 @@ body {
     color: #2C2C2C;
 }
 
-/* Booking content (right side) */
+
 .booking-content {
     flex: 1;
     max-width: 384px;
@@ -332,7 +328,7 @@ body {
     color: #999999;
 }
 
-/* Final price calculation styles */
+
 .final-price-block {
     background: #F8F9FA;
     border: 1px solid #E9ECEF;
@@ -378,7 +374,7 @@ body {
     font-size: 20px;
 }
 
-/* Success and Cancel pages styles */
+
 .success-section,
 .cancel-section {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -430,7 +426,7 @@ body {
   opacity: 0.9;
 }
 
-/* Temporary booking notice */
+
 .temp-booking-notice {
   background: rgba(255, 193, 7, 0.2);
   border: 1px solid rgba(255, 193, 7, 0.5);
@@ -451,7 +447,7 @@ body {
   color: #fff;
 }
 
-/* Temporary booking info */
+
 .temp-booking-info {
   text-align: left;
   padding: 20px;
@@ -470,7 +466,7 @@ body {
   color: #ffc107;
 }
 
-/* Booking details card */
+
 .booking-details-card {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 15px;
@@ -534,7 +530,7 @@ body {
   color: #ffc107 !important;
 }
 
-/* Info card */
+
 .info-card {
     background: #F8F9FA;
     border: 1px solid #E9ECEF;
@@ -596,7 +592,7 @@ body {
     left: 0;
 }
 
-/* Action buttons */
+
 .action-buttons {
     display: flex;
     gap: 16px;
@@ -645,7 +641,7 @@ body {
     text-decoration: none;
 }
 
-/* Validation notification styles */
+
 .validation-notification {
     position: fixed;
     top: 20px;
@@ -734,7 +730,7 @@ body {
     }
 }
 
-/* Admin login page styles */
+
 .admin-login-section {
     background: #FFFFFF;
     box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.15);
@@ -788,7 +784,7 @@ body {
     margin: 0;
 }
 
-/* Login form card */
+
 .login-form-card {
     background: #F8F9FA;
     border: 1px solid #E9ECEF;
@@ -874,7 +870,7 @@ body {
     font-size: 18px;
 }
 
-/* Credentials info */
+
 .credentials-info {
     background: #F8F9FA;
     border: 1px solid #E9ECEF;
@@ -916,7 +912,7 @@ body {
     margin-bottom: 0;
 }
 
-/* Admin panel styles */
+
 .admin-panel-header {
     margin-bottom: 40px;
 }
@@ -975,7 +971,7 @@ body {
     font-size: 16px;
 }
 
-/* Admin sections */
+
 .admin-sections {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1024,7 +1020,7 @@ body {
     padding: 32px;
 }
 
-/* Settings form */
+
 .settings-form {
     display: flex;
     flex-direction: column;
@@ -1105,7 +1101,7 @@ body {
     font-size: 18px;
 }
 
-/* Metrics grid */
+
 .metrics-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1150,7 +1146,7 @@ body {
     color: #666666;
 }
 
-/* Admin table */
+
 .table-container {
     overflow-x: auto;
     border-radius: 12px;
@@ -1198,7 +1194,7 @@ body {
 
 
 
-/* Empty state */
+
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -1301,7 +1297,7 @@ body {
     font-size: 18px;
 }
 
-/* Decorative images */
+
 .decorative-images {
     position: absolute;
     top: 0;
@@ -1339,7 +1335,7 @@ body {
     object-fit: cover;
 }
 
-/* Bottom sections container */
+
 .bottom-sections {
     display: flex;
     gap: 24px;
@@ -1348,7 +1344,7 @@ body {
     margin: 0 auto;
 }
 
-/* Why us section */
+
 .why-us-section {
     flex: 1;
     text-align: center;
@@ -1398,7 +1394,7 @@ body {
     color: #2C2C2C;
 }
 
-/* Car image in why us section */
+
 .car-image {
     display: none;
 }
@@ -1407,7 +1403,7 @@ body {
     display: none;
 }
 
-/* FAQ section */
+
 .faq-section {
     flex: 1;
     text-align: center;
@@ -1484,7 +1480,7 @@ body {
     margin-bottom: 8px;
 }
 
-/* Footer */
+
 footer {
     background: #FFFFFF;
     box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.15);
@@ -1512,7 +1508,7 @@ footer p {
     text-align: center;
 }
 
-/* Responsive design */
+
 @media (max-width: 1200px) {
     .main-header {
         padding: 23px 60px;
@@ -1591,7 +1587,7 @@ footer p {
         align-items: center;
     }
     
-    /* Адаптивные стили для заголовка */
+    
     .header-title h1 {
         font-size: 18px;
         line-height: 1.3;
@@ -1837,7 +1833,7 @@ footer p {
     }
 }
 
-/* Дополнительные стили для очень маленьких экранов */
+
 @media (max-width: 480px) {
     .main-header {
         padding: 16px 15px;
@@ -1899,7 +1895,7 @@ footer p {
     }
 }
 
-/* Additional utility classes */
+
 .text-center {
     text-align: center;
 }
@@ -1912,12 +1908,12 @@ footer p {
     margin-top: 0;
 }
 
-/* Animation for FAQ */
+
 .faq-item.active .faq-header i {
     transform: rotate(180deg);
 }
 
-/* Focus states for accessibility */
+
 .form-group input:focus,
 .submit-btn:focus,
 .faq-header:focus {
@@ -1925,18 +1921,18 @@ footer p {
     outline-offset: 2px;
 }
 
-/* Loading states */
+
 .submit-btn.loading {
     opacity: 0.7;
     cursor: not-allowed;
 }
 
-/* Success states */
+
 .form-group.success input {
     border-color: #28a745;
 }
 
-/* Error states */
+
 .form-group.error input {
     border-color: #dc3545;
 }
@@ -1947,7 +1943,7 @@ footer p {
     margin-top: 4px;
 }
 
-/* Alert styles */
+
 .alert {
     padding: 12px 16px;
     margin-bottom: 16px;
@@ -1997,7 +1993,7 @@ footer p {
     opacity: 1;
 }
 
-/* Checkbox styles for minibus selection */
+
 .form-group input[type="checkbox"] {
     width: 18px;
     height: 18px;
@@ -2018,7 +2014,7 @@ footer p {
     margin-left: 8px;
 }
 
-/* Tariff sections */
+
 .tariff-section {
     margin-bottom: 15px;
 }
@@ -2039,7 +2035,7 @@ footer p {
     margin-bottom: 4px;
 }
 
-/* Agreement link in checkbox */
+
 .checkbox-group label a {
     color: #61AEEA;
     text-decoration: none;
@@ -2050,7 +2046,7 @@ footer p {
     text-decoration: underline;
 }
 
-/* Footer styles */
+
 .footer {
     background: #f8f9fa;
     padding: 20px 0 0 0;
@@ -2119,7 +2115,7 @@ footer p {
     margin-bottom: 5px;
 }
 
-/* Animation */
+
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -2132,7 +2128,7 @@ footer p {
   }
 }
 
-/* New sections styles */
+
 .tariffs-section {
   padding: 60px 0;
   background: #f8f9fa;
@@ -2469,7 +2465,7 @@ footer p {
   font-size: 1.2rem;
 }
 
-/* Responsive styles for new sections */
+
 @media (max-width: 768px) {
   .tariffs-container {
     grid-template-columns: 1fr;
